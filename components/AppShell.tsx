@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Logo } from "./Logo";
 import { MapSection } from "./MapSection";
+import { FeedSection } from "./FeedSection";
 
 type TabKey = "Map" | "Feed" | "Report" | "Announcements" | "Updates";
 
@@ -28,7 +29,7 @@ export function AppShell() {
 
   const sections: Record<TabKey, ReactNode> = {
     Map: <MapSection />,
-    Feed: <Placeholder title="Community feed" />,
+    Feed: <FeedSection />,
     Report: <Placeholder title="Report a flooded street" />,
     Announcements: <Placeholder title="Official announcements" />,
     Updates: <Placeholder title="From social media" />,
