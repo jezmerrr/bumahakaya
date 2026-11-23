@@ -8,9 +8,9 @@ import {
 
 describe("severityColor", () => {
   it("maps each severity to its brand hex", () => {
-    expect(severityColor("Passable")).toBe("#2e9e5b");
+    expect(severityColor("Passable")).toBe("#17845a");
     expect(severityColor("Caution")).toBe("#e8972a");
-    expect(severityColor("Impassable")).toBe("#d64550");
+    expect(severityColor("Impassable")).toBe("#c93a3a");
   });
 });
 

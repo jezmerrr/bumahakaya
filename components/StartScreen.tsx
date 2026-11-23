@@ -1,17 +1,16 @@
 "use client";
 
-import { PinMark } from "./Logo";
+/* eslint-disable @next/next/no-img-element */
 
 export function StartScreen({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center bg-navy px-8 text-center">
-      <PinMark className="h-20 w-auto" />
-      <p className="mt-5 font-display text-3xl font-extrabold tracking-tight">
-        <span className="text-white">Bumaha</span>
-        <span className="text-aqua">Kaya</span>
-        <span className="text-amber">?</span>
-      </p>
-      <p className="mt-4 font-display text-lg font-extrabold text-white">
+      <img
+        src="/brand/bumahakaya-stacked-on-navy.svg"
+        alt="BumahaKaya?"
+        className="h-40 w-auto"
+      />
+      <p className="mt-6 font-display text-lg font-extrabold text-white">
         Alamin bago lumusong.
       </p>
       <p className="mt-1 text-sm text-white/60">

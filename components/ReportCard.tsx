@@ -5,6 +5,7 @@ import { useState } from "react";
 import { relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
 import { Avatar, SensorBar, StatusPill } from "./ui";
+import { CommentIcon, MapPinIcon, ThumbsUpIcon } from "./icons";
 
 export function ReportCard({
   report,
@@ -42,7 +43,7 @@ export function ReportCard({
             </span>
           </p>
           <p className="flex items-center gap-1 text-xs text-navy/50">
-            <span aria-hidden>📍</span>
+            <MapPinIcon className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">{report.streetName}</span>
           </p>
         </div>
@@ -85,18 +86,16 @@ export function ReportCard({
           onClick={toggleConfirm}
           aria-pressed={confirmed}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-sm font-semibold ${
-            confirmed
-              ? "bg-signal text-white"
-              : "bg-navy/5 text-navy/70"
+            confirmed ? "bg-signal text-white" : "bg-navy/5 text-navy/70"
           }`}
         >
-          <span aria-hidden>👍</span> Confirm ({confirms})
+          <ThumbsUpIcon className="h-4 w-4" /> Confirm ({confirms})
         </button>
         <button
           type="button"
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-navy/5 py-2 text-sm font-semibold text-navy/70"
         >
-          <span aria-hidden>💬</span> Comments ({report.comments ?? 0})
+          <CommentIcon className="h-4 w-4" /> Comments ({report.comments ?? 0})
         </button>
       </div>
     </article>

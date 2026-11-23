@@ -1,9 +1,9 @@
 import type { Severity, WaterLevel } from "./types";
 
 const COLORS: Record<Severity, string> = {
-  Passable: "#2e9e5b",
+  Passable: "#17845a",
   Caution: "#e8972a",
-  Impassable: "#d64550",
+  Impassable: "#c93a3a",
 };
 
 const LABELS: Record<Severity, string> = {

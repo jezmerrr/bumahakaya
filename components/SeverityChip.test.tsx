@@ -7,7 +7,7 @@ describe("SeverityChip", () => {
     render(<SeverityChip severity="Impassable" />);
     const chip = screen.getByText("Hindi madaanan / Not passable");
     expect(chip).toBeInTheDocument();
-    expect(["#d64550", "rgb(214, 69, 80)"]).toContain(
+    expect(["#c93a3a", "rgb(201, 58, 58)"]).toContain(
       chip.style.backgroundColor,
     );
   });

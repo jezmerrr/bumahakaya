@@ -8,14 +8,23 @@ import { MapSection } from "./MapSection";
 import { ReportSection } from "./ReportSection";
 import { AlertsSection } from "./AlertsSection";
 import { ProfileSection } from "./ProfileSection";
+import {
+  BellIcon,
+  HomeIcon,
+  MapPinIcon,
+  PlusIcon,
+  UserIcon,
+} from "./icons";
+import type { ComponentType, SVGProps } from "react";
 
 type TabKey = "Home" | "Maps" | "Report" | "Alerts" | "Profile";
+type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
-const NAV: { key: Exclude<TabKey, "Report">; icon: string }[] = [
-  { key: "Home", icon: "🏠" },
-  { key: "Maps", icon: "📍" },
-  { key: "Alerts", icon: "🔔" },
-  { key: "Profile", icon: "👤" },
+const NAV: { key: Exclude<TabKey, "Report">; Icon: IconType }[] = [
+  { key: "Home", Icon: HomeIcon },
+  { key: "Maps", Icon: MapPinIcon },
+  { key: "Alerts", Icon: BellIcon },
+  { key: "Profile", Icon: UserIcon },
 ];
 
 export function AppShell() {
@@ -52,11 +61,11 @@ export function AppShell() {
       <main className="flex-1 pb-24">{sections[tab]}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-[1000] mx-auto flex w-full max-w-md items-center justify-between border-t border-navy/10 bg-white px-5 py-2">
-        {NAV.slice(0, 2).map(({ key, icon }) => (
+        {NAV.slice(0, 2).map(({ key, Icon }) => (
           <NavButton
             key={key}
             label={key}
-            icon={icon}
+            Icon={Icon}
             active={tab === key}
             onClick={() => setTab(key)}
           />
@@ -66,16 +75,16 @@ export function AppShell() {
           type="button"
           aria-label="Report"
           onClick={() => setTab("Report")}
-          className="-mt-8 grid h-14 w-14 shrink-0 place-items-center rounded-full bg-amber text-2xl font-bold text-white shadow-lg"
+          className="-mt-8 grid h-14 w-14 shrink-0 place-items-center rounded-full bg-amber text-white shadow-lg"
         >
-          <span aria-hidden>＋</span>
+          <PlusIcon className="h-6 w-6" />
         </button>
 
-        {NAV.slice(2).map(({ key, icon }) => (
+        {NAV.slice(2).map(({ key, Icon }) => (
           <NavButton
             key={key}
             label={key}
-            icon={icon}
+            Icon={Icon}
             active={tab === key}
             onClick={() => setTab(key)}
           />
@@ -87,12 +96,12 @@ export function AppShell() {
 
 function NavButton({
   label,
-  icon,
+  Icon,
   active,
   onClick,
 }: {
   label: string;
-  icon: string;
+  Icon: IconType;
   active: boolean;
   onClick: () => void;
 }) {
@@ -105,9 +114,7 @@ function NavButton({
         active ? "text-signal" : "text-navy/50"
       }`}
     >
-      <span aria-hidden className="text-base leading-none">
-        {icon}
-      </span>
+      <Icon className="h-5 w-5" />
       {label}
     </button>
   );
