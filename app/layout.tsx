@@ -16,9 +16,9 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "BumahaKaya? — Alamin bago lumusong",
+  title: "BumahaKaya? Alamin bago lumusong",
   description:
-    "Hyperlocal flood updates for the streets around DLSU Manila. Community reports, sensors, and official advisories in one place.",
+    "Flood updates for the streets around DLSU Manila. Community reports, sensors, and official advisories in one place.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

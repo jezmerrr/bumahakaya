@@ -42,7 +42,14 @@ export function AppShell() {
     Maps: <MapSection />,
     Report: <ReportSection onPosted={() => setTab("Home")} />,
     Alerts: <AlertsSection />,
-    Profile: <ProfileSection />,
+    Profile: (
+      <ProfileSection
+        onLogout={() => {
+          setTab("Home");
+          setStarted(false);
+        }}
+      />
+    ),
   };
 
   return (
@@ -54,8 +61,9 @@ export function AppShell() {
       </header>
 
       <p className="bg-amber/10 px-4 py-1.5 text-[11px] leading-snug text-navy/70">
-        Demo. BumahaKaya? is a supplementary source and does not replace
-        official PAGASA or LGU advisories.
+        Heads up, this is a demo. Always follow official PAGASA and LGU
+        advisories. BumahaKaya? helps you check your street, it does not replace
+        them.
       </p>
 
       <main className="flex-1 pb-24">{sections[tab]}</main>

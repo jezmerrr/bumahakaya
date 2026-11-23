@@ -16,6 +16,7 @@ import {
   seedSensors,
   seedSocial,
 } from "@/data/seed";
+import { CURRENT_USER } from "./user";
 
 const REPORTS_KEY = "bk.reports.v1";
 const COMMENTS_KEY = "bk.comments.v1";
@@ -50,7 +51,7 @@ function save<T>(key: string, value: T[]): void {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // storage unavailable — keep in-memory state
+    // storage unavailable, keep in-memory state
   }
 }
 
@@ -90,7 +91,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const comment: Comment = {
       id: makeId(),
       reportId,
-      author: "you",
+      author: CURRENT_USER.handle,
       text: trimmed,
       timestamp: new Date().toISOString(),
     };

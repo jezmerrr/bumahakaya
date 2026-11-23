@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { severityColor } from "@/lib/severity";
 import type { LatLng } from "@/lib/geo";
 import type { Severity, WaterLevel } from "@/lib/types";
+import { CURRENT_USER } from "@/lib/user";
 
 const DLSU_CENTER: LatLng = { lat: 14.5647, lng: 120.9936 };
 
@@ -43,7 +44,7 @@ export function ReportSection({ onPosted }: { onPosted?: () => void }) {
       waterLevel: WATER_LEVEL[severity],
       passable: severity !== "Impassable",
       photoUrl,
-      author: "you",
+      author: CURRENT_USER.handle,
       confirms: 0,
       comments: 0,
     });
