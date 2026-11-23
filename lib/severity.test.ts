@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { severityColor, severityLabel, waterLevelToSeverity } from "./severity";
+import {
+  severityColor,
+  severityLabel,
+  severityShort,
+  waterLevelToSeverity,
+} from "./severity";
 
 describe("severityColor", () => {
   it("maps each severity to its brand hex", () => {
@@ -14,6 +19,14 @@ describe("severityLabel", () => {
     expect(severityLabel("Passable")).toBe("Madadaanan / Passable");
     expect(severityLabel("Caution")).toBe("Mag-ingat / Gutter-deep");
     expect(severityLabel("Impassable")).toBe("Hindi madaanan / Not passable");
+  });
+});
+
+describe("severityShort", () => {
+  it("gives the short English road-status label", () => {
+    expect(severityShort("Passable")).toBe("Passable");
+    expect(severityShort("Caution")).toBe("Gutter-deep");
+    expect(severityShort("Impassable")).toBe("Not passable");
   });
 });
 

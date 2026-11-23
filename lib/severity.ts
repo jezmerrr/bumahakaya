@@ -12,6 +12,16 @@ const LABELS: Record<Severity, string> = {
   Impassable: "Hindi madaanan / Not passable",
 };
 
+const SHORT_LABELS: Record<Severity, string> = {
+  Passable: "Passable",
+  Caution: "Gutter-deep",
+  Impassable: "Not passable",
+};
+
+export function severityShort(severity: Severity): string {
+  return SHORT_LABELS[severity];
+}
+
 export function severityColor(severity: Severity): string {
   return COLORS[severity];
 }

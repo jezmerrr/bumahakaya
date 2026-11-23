@@ -14,13 +14,21 @@ export function PinMark({ className }: { className?: string }) {
   );
 }
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({
+  className,
+  variant = "light",
+}: {
+  className?: string;
+  variant?: "light" | "dark";
+}) {
+  const bumaha = variant === "dark" ? "text-white" : "text-navy";
+  const kaya = variant === "dark" ? "text-aqua" : "text-signal";
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
       <PinMark className="h-7 w-auto" />
-      <span className="font-display text-xl font-extrabold tracking-tight leading-none">
-        <span className="text-navy">Bumaha</span>
-        <span className="text-signal">Kaya</span>
+      <span className="font-display text-xl font-extrabold leading-none tracking-tight">
+        <span className={bumaha}>Bumaha</span>
+        <span className={kaya}>Kaya</span>
         <span className="text-amber">?</span>
       </span>
     </span>

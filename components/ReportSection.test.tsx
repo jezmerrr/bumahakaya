@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReportSection } from "./ReportSection";
@@ -10,6 +10,7 @@ function Harness() {
     <div>
       <span data-testid="count">{reports.length}</span>
       <span data-testid="first-source">{reports[0]?.source ?? ""}</span>
+      <span data-testid="first-severity">{reports[0]?.severity ?? ""}</span>
       <ReportSection />
     </div>
   );
@@ -23,47 +24,28 @@ function renderForm() {
   );
 }
 
-async function fillAndSubmit() {
-  const user = userEvent.setup();
-  await user.type(screen.getByLabelText(/street or landmark/i), "Agno St");
-  await user.selectOptions(screen.getByLabelText(/water level/i), "Knee");
-  await user.selectOptions(screen.getByLabelText(/road status/i), "Caution");
-  await user.click(screen.getByRole("button", { name: /submit report/i }));
-}
-
 beforeEach(() => {
   localStorage.clear();
 });
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
 describe("ReportSection", () => {
-  it("adds a community report with no photo and no note", async () => {
+  it("posts a community report with a selected status", async () => {
+    const user = userEvent.setup();
     renderForm();
     const before = Number(screen.getByTestId("count").textContent);
-    await fillAndSubmit();
+    await user.type(screen.getByLabelText(/location/i), "Agno St");
+    await user.click(screen.getByRole("button", { name: "Not passable" }));
+    await user.click(screen.getByRole("button", { name: /post report/i }));
     expect(Number(screen.getByTestId("count").textContent)).toBe(before + 1);
     expect(screen.getByTestId("first-source").textContent).toBe("community");
+    expect(screen.getByTestId("first-severity").textContent).toBe("Impassable");
   });
 
-  it("still works when geolocation is denied", async () => {
-    Object.defineProperty(global.navigator, "geolocation", {
-      configurable: true,
-      value: {
-        getCurrentPosition: (
-          _success: PositionCallback,
-          error?: PositionErrorCallback,
-        ) => error?.({ code: 1, message: "denied" } as GeolocationPositionError),
-      },
-    });
+  it("posts even with no location and no photo", async () => {
+    const user = userEvent.setup();
     renderForm();
     const before = Number(screen.getByTestId("count").textContent);
-    await userEvent.click(
-      screen.getByRole("button", { name: /use my location/i }),
-    );
-    await fillAndSubmit();
+    await user.click(screen.getByRole("button", { name: /post report/i }));
     expect(Number(screen.getByTestId("count").textContent)).toBe(before + 1);
   });
 });

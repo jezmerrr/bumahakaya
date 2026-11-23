@@ -1,41 +1,31 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
 import { useState, type FormEvent } from "react";
 import { useStore } from "@/lib/store";
-import { waterLevelToSeverity } from "@/lib/severity";
+import { severityColor } from "@/lib/severity";
 import type { LatLng } from "@/lib/geo";
 import type { Severity, WaterLevel } from "@/lib/types";
 
 const DLSU_CENTER: LatLng = { lat: 14.5647, lng: 120.9936 };
 
-export function ReportSection() {
+const WATER_LEVEL: Record<Severity, WaterLevel> = {
+  Passable: "Ankle",
+  Caution: "Knee",
+  Impassable: "Waist+",
+};
+
+const OPTIONS: { severity: Severity; label: string }[] = [
+  { severity: "Passable", label: "Passable" },
+  { severity: "Caution", label: "Gutter-deep" },
+  { severity: "Impassable", label: "Not passable" },
+];
+
+export function ReportSection({ onPosted }: { onPosted?: () => void }) {
   const { addReport } = useStore();
-
-  const [street, setStreet] = useState("");
-  const [waterLevel, setWaterLevel] = useState<WaterLevel>("Knee");
+  const [location, setLocation] = useState("");
   const [severity, setSeverity] = useState<Severity>("Caution");
-  const [note, setNote] = useState("");
   const [photoUrl, setPhotoUrl] = useState<string | undefined>(undefined);
-  const [location, setLocation] = useState<LatLng>(DLSU_CENTER);
-  const [locationLabel, setLocationLabel] = useState("DLSU Manila (default)");
-  const [done, setDone] = useState(false);
-
-  function useMyLocation() {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setLocationLabel("Location unavailable — using DLSU Manila");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocationLabel("Using your current location");
-      },
-      () => {
-        setLocation(DLSU_CENTER);
-        setLocationLabel("Location denied — using DLSU Manila");
-      },
-    );
-  }
 
   function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -45,142 +35,102 @@ export function ReportSection() {
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     addReport({
-      lat: location.lat,
-      lng: location.lng,
-      streetName: street.trim() || "Unnamed street",
+      lat: DLSU_CENTER.lat,
+      lng: DLSU_CENTER.lng,
+      streetName: location.trim() || "Unnamed street near DLSU",
+      headline: location.trim() || "Flood report near DLSU",
       severity,
-      waterLevel,
+      waterLevel: WATER_LEVEL[severity],
       passable: severity !== "Impassable",
-      note: note.trim() || undefined,
       photoUrl,
+      author: "you",
+      confirms: 0,
+      comments: 0,
     });
-    setStreet("");
-    setNote("");
+    setLocation("");
     setPhotoUrl(undefined);
-    setDone(true);
+    setSeverity("Caution");
+    onPosted?.();
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 p-4">
-      <div>
-        <h2 className="font-display text-lg font-extrabold text-navy">
-          Report a flooded street
-        </h2>
-        <p className="text-xs text-navy/50">
-          Anonymous. Tulungan ang ibang commuter — i-report ang baha sa kalye mo.
-        </p>
+    <form onSubmit={onSubmit} className="px-4 pb-4 pt-4">
+      <h1 className="font-display text-2xl font-extrabold text-navy">
+        Report flooding
+      </h1>
+      <p className="text-sm text-navy/50">Help your neighbors stay safe</p>
+
+      <label
+        htmlFor="location"
+        className="mt-6 block text-xs font-semibold uppercase tracking-wide text-navy/50"
+      >
+        Location
+      </label>
+      <input
+        id="location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        placeholder="e.g. Taft Ave cor. Estrada"
+        className="mt-2 w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm"
+      />
+
+      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-navy/50">
+        Water level
+      </p>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        {OPTIONS.map((o) => {
+          const active = o.severity === severity;
+          const color = severityColor(o.severity);
+          return (
+            <button
+              key={o.severity}
+              type="button"
+              onClick={() => setSeverity(o.severity)}
+              aria-pressed={active}
+              style={
+                active
+                  ? { backgroundColor: color, color: "#fff" }
+                  : { backgroundColor: `${color}1a`, color }
+              }
+              className="rounded-2xl py-3 text-sm font-semibold"
+            >
+              {o.label}
+            </button>
+          );
+        })}
       </div>
 
-      <div>
-        <label
-          htmlFor="street"
-          className="block text-xs font-semibold text-navy"
-        >
-          Street or landmark
-        </label>
-        <input
-          id="street"
-          value={street}
-          onChange={(e) => setStreet(e.target.value)}
-          placeholder="e.g. Taft Ave cor. Vito Cruz"
-          className="mt-1 w-full rounded-xl border border-navy/15 px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label
-            htmlFor="water"
-            className="block text-xs font-semibold text-navy"
-          >
-            Water level
-          </label>
-          <select
-            id="water"
-            value={waterLevel}
-            onChange={(e) => {
-              const level = e.target.value as WaterLevel;
-              setWaterLevel(level);
-              setSeverity(waterLevelToSeverity(level));
-            }}
-            className="mt-1 w-full rounded-xl border border-navy/15 px-3 py-2 text-sm"
-          >
-            <option value="Ankle">Ankle (sakong)</option>
-            <option value="Knee">Knee (tuhod)</option>
-            <option value="Waist+">Waist+ (bewang)</option>
-          </select>
-        </div>
-
-        <div>
-          <label
-            htmlFor="status"
-            className="block text-xs font-semibold text-navy"
-          >
-            Road status
-          </label>
-          <select
-            id="status"
-            value={severity}
-            onChange={(e) => setSeverity(e.target.value as Severity)}
-            className="mt-1 w-full rounded-xl border border-navy/15 px-3 py-2 text-sm"
-          >
-            <option value="Passable">Madadaanan / Passable</option>
-            <option value="Caution">Mag-ingat / Gutter-deep</option>
-            <option value="Impassable">Hindi madaanan / Not passable</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="note" className="block text-xs font-semibold text-navy">
-          Note (optional)
-        </label>
-        <textarea
-          id="note"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={2}
-          placeholder="Anong nakita mo?"
-          className="mt-1 w-full rounded-xl border border-navy/15 px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="photo" className="block text-xs font-semibold text-navy">
-          Photo (optional)
-        </label>
+      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-navy/50">
+        Photo
+      </p>
+      <label
+        htmlFor="photo"
+        className="mt-2 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-navy/20 bg-white/50 text-sm text-navy/50"
+      >
+        {photoUrl ? (
+          <img
+            src={photoUrl}
+            alt="Selected flood photo"
+            className="h-24 w-full rounded-xl object-cover"
+          />
+        ) : (
+          <span>+ Tap to add a photo</span>
+        )}
         <input
           id="photo"
           type="file"
           accept="image/*"
           onChange={onPhoto}
-          className="mt-1 w-full text-xs text-navy/70"
+          className="hidden"
         />
-      </div>
-
-      <div className="flex items-center justify-between gap-2 rounded-xl bg-white p-3">
-        <span className="text-xs text-navy/60">{locationLabel}</span>
-        <button
-          type="button"
-          onClick={useMyLocation}
-          className="rounded-full border border-signal px-3 py-1 text-xs font-semibold text-signal"
-        >
-          Use my location
-        </button>
-      </div>
+      </label>
 
       <button
         type="submit"
-        className="w-full rounded-full bg-signal py-3 text-sm font-semibold text-white"
+        className="mt-6 w-full rounded-2xl bg-signal py-4 text-base font-semibold text-white"
       >
-        Submit report
+        Post report
       </button>
-
-      {done ? (
-        <p className="text-center text-xs font-semibold text-pass">
-          Salamat! Your report is now on the map and feed.
-        </p>
-      ) : null}
     </form>
   );
 }
