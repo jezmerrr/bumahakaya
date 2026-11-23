@@ -5,6 +5,8 @@ import { Logo } from "./Logo";
 import { MapSection } from "./MapSection";
 import { FeedSection } from "./FeedSection";
 import { ReportSection } from "./ReportSection";
+import { AnnouncementsSection } from "./AnnouncementsSection";
+import { UpdatesSection } from "./UpdatesSection";
 
 type TabKey = "Map" | "Feed" | "Report" | "Announcements" | "Updates";
 
@@ -16,15 +18,6 @@ const TABS: { key: TabKey; icon: string }[] = [
   { key: "Updates", icon: "💬" },
 ];
 
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div className="p-6 text-navy/60">
-      <h2 className="font-display text-lg font-extrabold text-navy">{title}</h2>
-      <p className="mt-1 text-sm">Coming up.</p>
-    </div>
-  );
-}
-
 export function AppShell() {
   const [tab, setTab] = useState<TabKey>("Map");
 
@@ -32,8 +25,8 @@ export function AppShell() {
     Map: <MapSection />,
     Feed: <FeedSection />,
     Report: <ReportSection />,
-    Announcements: <Placeholder title="Official announcements" />,
-    Updates: <Placeholder title="From social media" />,
+    Announcements: <AnnouncementsSection />,
+    Updates: <UpdatesSection />,
   };
 
   return (
