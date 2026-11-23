@@ -1,9 +1,10 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
+import { useStore } from "@/lib/store";
 import { Avatar, SensorBar, StatusPill } from "./ui";
 import { CommentIcon, MapPinIcon, ThumbsUpIcon } from "./icons";
 
@@ -14,8 +15,13 @@ export function ReportCard({
   report: Report;
   distanceM?: number;
 }) {
+  const { comments, addComment } = useStore();
+  const thread = comments.filter((c) => c.reportId === report.id);
+
   const [confirms, setConfirms] = useState(report.confirms ?? 0);
   const [confirmed, setConfirmed] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState("");
 
   const title = report.headline ?? report.streetName;
   const body = report.description ?? report.note;
@@ -23,6 +29,12 @@ export function ReportCard({
   function toggleConfirm() {
     setConfirms((c) => c + (confirmed ? -1 : 1));
     setConfirmed((v) => !v);
+  }
+
+  function postComment(e: FormEvent) {
+    e.preventDefault();
+    addComment(report.id, draft);
+    setDraft("");
   }
 
   return (
@@ -93,11 +105,58 @@ export function ReportCard({
         </button>
         <button
           type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-navy/5 py-2 text-sm font-semibold text-navy/70"
         >
-          <CommentIcon className="h-4 w-4" /> Comments ({report.comments ?? 0})
+          <CommentIcon className="h-4 w-4" /> Comments ({thread.length})
         </button>
       </div>
+
+      {open ? (
+        <div className="mt-3 border-t border-navy/10 pt-3">
+          {thread.length === 0 ? (
+            <p className="text-xs text-navy/40">
+              Wala pang comments. Ikaw ang mauna.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {thread.map((c) => (
+                <li key={c.id} className="flex gap-2">
+                  <Avatar name={c.author} className="h-7 w-7 text-[10px]" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs">
+                      <span className="font-semibold text-navy">
+                        {c.author}
+                      </span>
+                      <span className="text-navy/40">
+                        {" "}
+                        · {relativeTime(c.timestamp)}
+                      </span>
+                    </p>
+                    <p className="text-sm text-navy/70">{c.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <form onSubmit={postComment} className="mt-3 flex gap-2">
+            <input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Add a comment…"
+              className="min-w-0 flex-1 rounded-full border border-navy/15 bg-white px-3 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              className="rounded-full bg-signal px-4 py-2 text-sm font-semibold text-white"
+            >
+              Post
+            </button>
+          </form>
+        </div>
+      ) : null}
     </article>
   );
 }

@@ -1,4 +1,9 @@
-import type { Announcement, Report, SocialPost } from "@/lib/types";
+import type {
+  Announcement,
+  Comment,
+  Report,
+  SocialPost,
+} from "@/lib/types";
 
 const minsAgo = (n: number): string =>
   new Date(Date.now() - n * 60_000).toISOString();
@@ -203,6 +208,51 @@ export const seedSensors: Report[] = [
     trend: "falling",
     source: "sensor",
     timestamp: minsAgo(5),
+  },
+];
+
+export const seedComments: Comment[] = [
+  {
+    id: "c-001",
+    reportId: "r-001",
+    author: "mika.t",
+    text: "Confirmed, nasa Estrada ako ngayon. Hanggang tuhod talaga.",
+    timestamp: minsAgo(4),
+  },
+  {
+    id: "c-002",
+    reportId: "r-001",
+    author: "paolo.r",
+    text: "Salamat sa update! Iiwas muna ako diyan.",
+    timestamp: minsAgo(3),
+  },
+  {
+    id: "c-003",
+    reportId: "r-001",
+    author: "anna.cruz",
+    text: "May jeep pa ba dumadaan or wala na?",
+    timestamp: minsAgo(1),
+  },
+  {
+    id: "c-004",
+    reportId: "r-002",
+    author: "kent.d",
+    text: "Motor ko kayang-kaya pa kanina, dahan-dahan lang.",
+    timestamp: minsAgo(12),
+  },
+  {
+    id: "c-005",
+    reportId: "r-002",
+    author: "jules",
+    text: "Mag-ingat, madulas sa gilid.",
+    timestamp: minsAgo(8),
+  },
+  {
+    id: "c-006",
+    reportId: "r-005",
+    author: "bea.s",
+    text: "Grabe, waist-deep na nga dito. Wag na dumaan.",
+    timestamp: minsAgo(20),
   },
 ];
 

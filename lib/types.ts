@@ -28,6 +28,14 @@ export interface Report {
   comments?: number;
 }
 
+export interface Comment {
+  id: string;
+  reportId: string;
+  author: string;
+  text: string;
+  timestamp: string;
+}
+
 export type AnnouncementType = "suspension" | "closure" | "advisory";
 
 export interface Announcement {

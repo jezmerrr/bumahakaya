@@ -8,15 +8,17 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Announcement, Report, SocialPost } from "./types";
+import type { Announcement, Comment, Report, SocialPost } from "./types";
 import {
   seedAnnouncements,
+  seedComments,
   seedReports,
   seedSensors,
   seedSocial,
 } from "@/data/seed";
 
 const REPORTS_KEY = "bk.reports.v1";
+const COMMENTS_KEY = "bk.comments.v1";
 
 export type NewReport = Omit<Report, "id" | "timestamp" | "source">;
 
@@ -25,20 +27,30 @@ interface StoreValue {
   sensors: Report[];
   announcements: Announcement[];
   social: SocialPost[];
+  comments: Comment[];
   addReport: (input: NewReport) => void;
+  addComment: (reportId: string, text: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
 
-function loadReports(): Report[] {
-  if (typeof window === "undefined") return seedReports;
+function loadJSON<T>(key: string, fallback: T[]): T[] {
+  if (typeof window === "undefined") return fallback;
   try {
-    const raw = window.localStorage.getItem(REPORTS_KEY);
-    if (!raw) return seedReports;
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return fallback;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Report[]) : seedReports;
+    return Array.isArray(parsed) ? (parsed as T[]) : fallback;
   } catch {
-    return seedReports;
+    return fallback;
+  }
+}
+
+function save<T>(key: string, value: T[]): void {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // storage unavailable — keep in-memory state
   }
 }
 
@@ -51,9 +63,11 @@ function makeId(): string {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<Report[]>(seedReports);
+  const [comments, setComments] = useState<Comment[]>(seedComments);
 
   useEffect(() => {
-    setReports(loadReports());
+    setReports(loadJSON(REPORTS_KEY, seedReports));
+    setComments(loadJSON(COMMENTS_KEY, seedComments));
   }, []);
 
   const addReport = useCallback((input: NewReport) => {
@@ -65,11 +79,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
     setReports((prev) => {
       const next = [report, ...prev];
-      try {
-        window.localStorage.setItem(REPORTS_KEY, JSON.stringify(next));
-      } catch {
-        // storage unavailable — keep in-memory state
-      }
+      save(REPORTS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const addComment = useCallback((reportId: string, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const comment: Comment = {
+      id: makeId(),
+      reportId,
+      author: "you",
+      text: trimmed,
+      timestamp: new Date().toISOString(),
+    };
+    setComments((prev) => {
+      const next = [comment, ...prev];
+      save(COMMENTS_KEY, next);
       return next;
     });
   }, []);
@@ -79,7 +106,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     sensors: seedSensors,
     announcements: seedAnnouncements,
     social: seedSocial,
+    comments,
     addReport,
+    addComment,
   };
 
   return (

@@ -2,7 +2,19 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StoreProvider, useStore } from "./store";
-import { seedReports } from "@/data/seed";
+import { seedReports, seedComments } from "@/data/seed";
+
+function CommentProbe() {
+  const { comments, addComment } = useStore();
+  const thread = comments.filter((c) => c.reportId === "r-001");
+  return (
+    <div>
+      <span data-testid="thread-count">{thread.length}</span>
+      <span data-testid="first-text">{thread[0]?.text ?? ""}</span>
+      <button onClick={() => addComment("r-001", "my new comment")}>add</button>
+    </div>
+  );
+}
 
 function Probe() {
   const { reports, addReport } = useStore();
@@ -58,6 +70,25 @@ describe("store", () => {
     expect(screen.getByTestId("first-id").textContent).not.toBe("");
     expect(screen.getByTestId("first-source").textContent).toBe("community");
     expect(localStorage.getItem("bk.reports.v1")).toContain("hello flood");
+  });
+
+  it("seeds comments and adds a new one, persisting it", async () => {
+    render(
+      <StoreProvider>
+        <CommentProbe />
+      </StoreProvider>,
+    );
+    const seededForR1 = seedComments.filter((c) => c.reportId === "r-001")
+      .length;
+    expect(screen.getByTestId("thread-count").textContent).toBe(
+      String(seededForR1),
+    );
+    await userEvent.click(screen.getByText("add"));
+    expect(screen.getByTestId("thread-count").textContent).toBe(
+      String(seededForR1 + 1),
+    );
+    expect(screen.getByTestId("first-text").textContent).toBe("my new comment");
+    expect(localStorage.getItem("bk.comments.v1")).toContain("my new comment");
   });
 
   it("falls back to seed when localStorage is corrupted", () => {
