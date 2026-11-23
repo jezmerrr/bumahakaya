@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Logo } from "./Logo";
+import { MapSection } from "./MapSection";
 
 type TabKey = "Map" | "Feed" | "Report" | "Announcements" | "Updates";
 
@@ -26,7 +27,7 @@ export function AppShell() {
   const [tab, setTab] = useState<TabKey>("Map");
 
   const sections: Record<TabKey, ReactNode> = {
-    Map: <Placeholder title="Live flood map" />,
+    Map: <MapSection />,
     Feed: <Placeholder title="Community feed" />,
     Report: <Placeholder title="Report a flooded street" />,
     Announcements: <Placeholder title="Official announcements" />,
