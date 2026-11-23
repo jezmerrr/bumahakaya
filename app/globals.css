@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* BumahaKaya? brand tokens */
+@theme {
+  --color-navy: #0b2545;
+  --color-signal: #1e6fd9;
+  --color-aqua: #4fc3e8;
+  --color-amber: #e8972a;
+  --color-mist: #f5f8fb;
+
+  /* Road status (in-app) */
+  --color-pass: #2e9e5b;
+  --color-caution: #e8972a;
+  --color-impass: #d64550;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-mist);
+  color: var(--color-navy);
+  font-family: var(--font-sans);
+}
