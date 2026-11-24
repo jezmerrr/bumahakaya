@@ -11,7 +11,7 @@ async function enterApp() {
       <AppShell />
     </StoreProvider>,
   );
-  await user.click(screen.getByRole("button", { name: /magsimula/i }));
+  await user.click(screen.getByRole("button", { name: /continue as guest/i }));
   return user;
 }
 
