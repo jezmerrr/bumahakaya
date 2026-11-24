@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
+import { Circle, CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import type { LatLng } from "@/lib/geo";
 import { severityColor, severityLabel } from "@/lib/severity";
 import { relativeTime } from "@/lib/time";
@@ -24,6 +24,31 @@ export default function MapView({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      {/* Flood-affected areas */}
+      {markers.map((m) => (
+        <Circle
+          key={`${m.id}-flood-area`}
+          center={[m.lat, m.lng]}
+          radius={
+            m.waterLevel === "Waist+"
+              ? 145
+              : m.waterLevel === "Knee"
+                ? 110
+                : 75
+          }
+          pathOptions={{
+            color: severityColor(m.severity),
+            weight: 2,
+            opacity: 0.9,
+            dashArray: "3 7",
+            lineCap: "round",
+            fillColor: severityColor(m.severity),
+            fillOpacity: 0.22,
+          }}
+        />
+      ))}
+
+      {/* Original map markers */}
       {markers.map((m) => (
         <CircleMarker
           key={m.id}
