@@ -45,4 +45,16 @@ describe("ReportCard comments", () => {
       screen.getByRole("button", { name: /comments \(4\)/i }),
     ).toBeInTheDocument();
   });
+
+  it("lets you remove your own comment", async () => {
+    const user = userEvent.setup();
+    renderCard();
+    await user.click(screen.getByRole("button", { name: /comments/i }));
+    await user.type(screen.getByPlaceholderText(/add a comment/i), "mine");
+    await user.click(screen.getByRole("button", { name: "Post" }));
+    expect(screen.getByText("mine")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /remove comment/i }));
+    expect(screen.queryByText("mine")).toBeNull();
+  });
 });

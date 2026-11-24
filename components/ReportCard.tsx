@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 import { relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
 import { useStore } from "@/lib/store";
+import { CURRENT_USER } from "@/lib/user";
 import { Avatar, SensorBar, StatusPill } from "./ui";
 import { CommentIcon, MapPinIcon, ThumbsUpIcon } from "./icons";
 
@@ -15,8 +16,10 @@ export function ReportCard({
   report: Report;
   distanceM?: number;
 }) {
-  const { comments, addComment } = useStore();
+  const { comments, addComment, removeReport, removeComment } = useStore();
   const thread = comments.filter((c) => c.reportId === report.id);
+  const isMine =
+    report.source === "community" && report.author === CURRENT_USER.handle;
 
   const [confirms, setConfirms] = useState(report.confirms ?? 0);
   const [confirmed, setConfirmed] = useState(false);
@@ -59,6 +62,16 @@ export function ReportCard({
             <span className="truncate">{report.streetName}</span>
           </p>
         </div>
+        {isMine ? (
+          <button
+            type="button"
+            aria-label="Remove report"
+            onClick={() => removeReport(report.id)}
+            className="shrink-0 self-start rounded-full bg-impass/10 px-2.5 py-1 text-[11px] font-semibold text-impass"
+          >
+            Remove
+          </button>
+        ) : null}
       </div>
 
       <div className="mt-3 flex gap-3">
@@ -133,6 +146,16 @@ export function ReportCard({
                         {" "}
                         · {relativeTime(c.timestamp)}
                       </span>
+                      {c.author === CURRENT_USER.handle ? (
+                        <button
+                          type="button"
+                          aria-label="Remove comment"
+                          onClick={() => removeComment(c.id)}
+                          className="ml-2 font-semibold text-impass"
+                        >
+                          Remove
+                        </button>
+                      ) : null}
                     </p>
                     <p className="text-sm text-navy/70">{c.text}</p>
                   </div>

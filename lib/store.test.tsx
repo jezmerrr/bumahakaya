@@ -16,6 +16,18 @@ function CommentProbe() {
   );
 }
 
+function RemoveProbe() {
+  const { reports, comments, removeReport, removeComment } = useStore();
+  return (
+    <div>
+      <span data-testid="reports">{reports.length}</span>
+      <span data-testid="comments">{comments.length}</span>
+      <button onClick={() => removeReport("r-002")}>del-report</button>
+      <button onClick={() => removeComment("c-001")}>del-comment</button>
+    </div>
+  );
+}
+
 function Probe() {
   const { reports, addReport } = useStore();
   return (
@@ -89,6 +101,28 @@ describe("store", () => {
     );
     expect(screen.getByTestId("first-text").textContent).toBe("my new comment");
     expect(localStorage.getItem("bk.comments.v1")).toContain("my new comment");
+  });
+
+  it("removes a report and a comment, persisting both", async () => {
+    render(
+      <StoreProvider>
+        <RemoveProbe />
+      </StoreProvider>,
+    );
+    const reportsBefore = Number(screen.getByTestId("reports").textContent);
+    const commentsBefore = Number(screen.getByTestId("comments").textContent);
+
+    await userEvent.click(screen.getByText("del-report"));
+    expect(Number(screen.getByTestId("reports").textContent)).toBe(
+      reportsBefore - 1,
+    );
+    expect(localStorage.getItem("bk.reports.v1")).not.toContain("r-002");
+
+    await userEvent.click(screen.getByText("del-comment"));
+    expect(Number(screen.getByTestId("comments").textContent)).toBe(
+      commentsBefore - 1,
+    );
+    expect(localStorage.getItem("bk.comments.v1")).not.toContain("c-001");
   });
 
   it("falls back to seed when localStorage is corrupted", () => {

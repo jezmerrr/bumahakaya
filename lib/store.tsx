@@ -31,6 +31,8 @@ interface StoreValue {
   comments: Comment[];
   addReport: (input: NewReport) => void;
   addComment: (reportId: string, text: string) => void;
+  removeReport: (id: string) => void;
+  removeComment: (id: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -102,6 +104,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const removeReport = useCallback((id: string) => {
+    setReports((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      save(REPORTS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const removeComment = useCallback((id: string) => {
+    setComments((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      save(COMMENTS_KEY, next);
+      return next;
+    });
+  }, []);
+
   const value: StoreValue = {
     reports,
     sensors: seedSensors,
@@ -110,6 +128,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     comments,
     addReport,
     addComment,
+    removeReport,
+    removeComment,
   };
 
   return (

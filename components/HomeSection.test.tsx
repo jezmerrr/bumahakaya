@@ -32,6 +32,23 @@ describe("HomeSection", () => {
     expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
   });
 
+  it("lets you remove your own report from the feed", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    // Seed report r-002 is authored by the current user and is removable.
+    expect(
+      screen.getByText(/Road near Henry still passable/i),
+    ).toBeInTheDocument();
+    const removeButtons = screen.getAllByRole("button", {
+      name: /remove report/i,
+    });
+    expect(removeButtons).toHaveLength(1);
+    await user.click(removeButtons[0]);
+    expect(
+      screen.queryByText(/Road near Henry still passable/i),
+    ).toBeNull();
+  });
+
   it("increments a report's Confirm count when tapped", async () => {
     const user = userEvent.setup();
     renderHome();
