@@ -1,3 +1,4 @@
+
 import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -13,10 +14,14 @@ function renderHome() {
 }
 
 describe("HomeSection", () => {
-  it("shows community reports by default", () => {
+  it("shows all posts by default", () => {
     renderHome();
     expect(screen.getAllByTestId("report-card").length).toBeGreaterThan(0);
-    expect(screen.queryByTestId("social-card")).toBeNull();
+    expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("switches to social posts, then both with All", async () => {
@@ -56,7 +61,7 @@ describe("HomeSection", () => {
     const confirm = within(card).getByRole("button", { name: /confirm/i });
     await user.click(confirm);
     expect(
-      within(card).getByRole("button", { name: /confirm \(13\)/i }),
+      within(card).getByRole("button", { name: /confirm \(\s*13\s*\)/i }),
     ).toBeInTheDocument();
   });
 });

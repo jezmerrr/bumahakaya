@@ -1,3 +1,4 @@
+
 import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -41,11 +42,25 @@ describe("ReportSection", () => {
     expect(screen.getByTestId("first-severity").textContent).toBe("Impassable");
   });
 
-  it("posts even with no location and no photo", async () => {
+  it("does not post a report without a location", async () => {
     const user = userEvent.setup();
     renderForm();
     const before = Number(screen.getByTestId("count").textContent);
+
     await user.click(screen.getByRole("button", { name: /post report/i }));
+
+    expect(Number(screen.getByTestId("count").textContent)).toBe(before);
+    expect(screen.getByLabelText(/location/i)).toBeInvalid();
+  });
+
+  it("allows a report to be posted without a photo", async () => {
+    const user = userEvent.setup();
+    renderForm();
+    const before = Number(screen.getByTestId("count").textContent);
+
+    await user.type(screen.getByLabelText(/location/i), "Agno St");
+    await user.click(screen.getByRole("button", { name: /post report/i }));
+
     expect(Number(screen.getByTestId("count").textContent)).toBe(before + 1);
   });
 });
