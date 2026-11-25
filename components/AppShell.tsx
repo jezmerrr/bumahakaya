@@ -8,6 +8,7 @@ import { MapSection } from "./MapSection";
 import { ReportSection } from "./ReportSection";
 import { AlertsSection } from "./AlertsSection";
 import { ProfileSection } from "./ProfileSection";
+import { BusinessDashboard } from "./BusinessDashboard";
 import {
   BellIcon,
   HomeIcon,
@@ -17,7 +18,7 @@ import {
 } from "./icons";
 import type { ComponentType, SVGProps } from "react";
 
-type TabKey = "Home" | "Maps" | "Report" | "Alerts" | "Profile";
+type TabKey = "Home" | "Maps" | "Report" | "Alerts" | "Profile" | "Business";
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
 const NAV: { key: Exclude<TabKey, "Report">; Icon: IconType }[] = [
@@ -46,8 +47,10 @@ export function AppShell() {
           setTab("Home");
           setStarted(false);
         }}
+        onBusinessDashboard={() => setTab("Business")}
       />
     ),
+    Business: <BusinessDashboard onBack={() => setTab("Profile")} />,
   };
 
   return (
