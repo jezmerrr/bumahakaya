@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from "react";
@@ -9,11 +10,11 @@ import { SocialCard } from "./SocialCard";
 const DLSU_CENTER: LatLng = { lat: 14.5647, lng: 120.9936 };
 
 type Filter = "Community" | "Social" | "All";
-const FILTERS: Filter[] = ["Community", "Social", "All"];
+const FILTERS: Filter[] = ["All", "Community", "Social"];
 
 export function HomeSection() {
   const { reports, social } = useStore();
-  const [filter, setFilter] = useState<Filter>("Community");
+  const [filter, setFilter] = useState<Filter>("All");
 
   const sortedReports = useMemo(
     () =>
