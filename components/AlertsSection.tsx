@@ -1,14 +1,52 @@
+
 "use client";
+
+import {
+  CloudRain,
+  GraduationCap,
+  Landmark,
+  Waves,
+  type LucideIcon,
+} from "lucide-react";
 
 import { useStore } from "@/lib/store";
 import { relativeTime } from "@/lib/time";
-import type { AnnouncementType } from "@/lib/types";
+import type { AnnouncementSource } from "@/lib/types";
 import { DemoDataBadge } from "./DemoDataBadge";
 
-const ICON: Record<AnnouncementType, { bg: string; dot: string }> = {
-  closure: { bg: "bg-impass/10", dot: "bg-impass" },
-  suspension: { bg: "bg-amber/15", dot: "bg-amber" },
-  advisory: { bg: "bg-signal/10", dot: "bg-signal" },
+const SOURCE_STYLE: Record<
+  AnnouncementSource,
+  {
+    label: string;
+    bg: string;
+    color: string;
+    Icon: LucideIcon;
+  }
+> = {
+  lgu: {
+    label: "LGU",
+    bg: "bg-blue-50",
+    color: "text-blue-700",
+    Icon: Landmark,
+  },
+  school: {
+    label: "School",
+    bg: "bg-violet-50",
+    color: "text-violet-700",
+    Icon: GraduationCap,
+  },
+  sensor: {
+    label: "Water Sensor",
+    bg: "bg-teal-50",
+    color: "text-teal-700",
+    Icon: Waves,
+  },
+  weather: {
+    label: "Weather",
+    bg: "bg-rose-50",
+    color: "text-rose-700",
+    Icon: CloudRain,
+  },
 };
 
 export function AlertsSection() {
@@ -16,22 +54,27 @@ export function AlertsSection() {
 
   return (
     <div className="px-4 pb-4 pt-4">
-      <h1 className="font-display text-2xl font-extrabold text-navy">Alerts</h1>
+      <h1 className="font-display text-2xl font-extrabold text-navy">
+        Alerts
+      </h1>
       <p className="text-sm text-navy/50">Flood warnings near you</p>
 
       <div className="mt-4 space-y-3">
         {announcements.map((a) => {
-          const icon = ICON[a.type];
+          const source = SOURCE_STYLE[a.source];
+          const Icon = source.Icon;
+
           return (
             <article
               key={a.id}
               className="flex gap-3 rounded-3xl bg-white p-4 shadow-sm"
             >
               <span
-                className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${icon.bg}`}
+                className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${source.bg} ${source.color}`}
               >
-                <span className={`h-3 w-3 rounded-full ${icon.dot}`} />
+                <Icon size={21} strokeWidth={1.8} />
               </span>
+
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-display text-sm font-extrabold text-navy">
@@ -41,11 +84,22 @@ export function AlertsSection() {
                     {relativeTime(a.timestamp)}
                   </span>
                 </div>
-                <p className="mt-0.5 text-xs text-navy/60">{a.body}</p>
-                <div className="mt-2 flex items-center gap-1.5">
+
+                <p className="mt-1 text-xs leading-relaxed text-navy/60">
+                  {a.body}
+                </p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${source.bg} ${source.color}`}
+                  >
+                    {source.label}
+                  </span>
+
                   <span className="text-[11px] font-semibold text-navy/50">
                     {a.agency}
                   </span>
+
                   <DemoDataBadge />
                 </div>
               </div>

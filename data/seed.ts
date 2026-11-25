@@ -263,6 +263,7 @@ export const seedAnnouncements: Announcement[] = [
     body: "3 reports + sensor: knee-deep water. Expect heavy traffic and plan alternate routes.",
     agency: "Manila CDRRMO",
     type: "closure",
+    source: "lgu",
     timestamp: minsAgo(5),
   },
   {
@@ -271,6 +272,7 @@ export const seedAnnouncements: Announcement[] = [
     body: "No classes today, Manila LGU advisory for all levels due to flooding.",
     agency: "Manila City Government",
     type: "suspension",
+    source: "lgu",
     timestamp: minsAgo(22),
   },
   {
@@ -279,7 +281,17 @@ export const seedAnnouncements: Announcement[] = [
     body: "Vito Cruz sensor now at 28 cm. Residents in low-lying areas, take precautions.",
     agency: "PAGASA",
     type: "advisory",
+    source: "sensor",
     timestamp: minsAgo(60),
+  },
+  {
+    id: "a-04",
+    title: "Shift to online",
+    body: "DLSU-Manila classes shifted online due to flooding. Check your LMS for updates.",
+    agency: "DLSU",
+    type: "advisory",
+    source: "school",
+    timestamp: minsAgo(120),
   },
 ];
 

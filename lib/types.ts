@@ -4,6 +4,8 @@ export type WaterLevel = "Ankle" | "Knee" | "Waist+";
 
 export type Source = "community" | "sensor" | "official";
 
+export type AnnouncementSource = "lgu" | "school" | "sensor" | "weather";
+
 export type Trend = "rising" | "steady" | "falling";
 
 export interface Report {
@@ -44,6 +46,7 @@ export interface Announcement {
   body: string;
   agency: string;
   type: AnnouncementType;
+  source: AnnouncementSource;
   timestamp: string;
 }
 
