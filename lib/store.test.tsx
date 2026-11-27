@@ -205,3 +205,41 @@ describe("withSeedPhotos", () => {
     expect(withSeedPhotos([mine])[0].photoUrl).toBe("data:image/jpeg;base64,AAA");
   });
 });
+
+function FlagProbe() {
+  const { reports, flagCount, isDisputed, myFlag, flagReport, unflagReport } = useStore();
+  const r1 = reports.find((r) => r.id === "r-001")!;
+  const r7 = reports.find((r) => r.id === "r-007")!;
+  return (
+    <div>
+      <span data-testid="r1">{`${flagCount(r1)}|${isDisputed(r1)}|${myFlag("r-001") ?? ""}`}</span>
+      <span data-testid="r7">{`${flagCount(r7)}|${isDisputed(r7)}`}</span>
+      <button onClick={() => flagReport("r-001", "no-flood")}>flag</button>
+      <button onClick={() => flagReport("r-001", "outdated")}>reflag</button>
+      <button onClick={() => unflagReport("r-001")}>unflag</button>
+    </div>
+  );
+}
+
+describe("flagging reports", () => {
+  it("counts one flag per person, can change the reason, undo, and persists", async () => {
+    render(
+      <StoreProvider>
+        <FlagProbe />
+      </StoreProvider>,
+    );
+    expect(screen.getByTestId("r1").textContent).toBe("0|false|");
+    // Seed: r-007 was already flagged by 4 people.
+    expect(screen.getByTestId("r7").textContent).toBe("4|true");
+
+    await userEvent.click(screen.getByText("flag"));
+    expect(screen.getByTestId("r1").textContent).toBe("1|false|no-flood");
+    await userEvent.click(screen.getByText("reflag"));
+    expect(screen.getByTestId("r1").textContent).toBe("1|false|outdated");
+    expect(localStorage.getItem("bk.flags.v1")).toContain("outdated");
+
+    await userEvent.click(screen.getByText("unflag"));
+    expect(screen.getByTestId("r1").textContent).toBe("0|false|");
+    expect(localStorage.getItem("bk.flags.v1")).toBe("[]");
+  });
+});

@@ -220,3 +220,63 @@ describe("ReportCard confirmations", () => {
     expect(screen.getByRole("button", { name: "Confirm (13)" })).toHaveAttribute("aria-pressed", "true");
   });
 });
+
+describe("ReportCard flagging", () => {
+  it("has no flag button on your own report", () => {
+    render(
+      <StoreProvider>
+        <LiveCard id="r-002" />
+      </StoreProvider>,
+    );
+    expect(screen.queryByRole("button", { name: /flag as fake or wrong/i })).toBeNull();
+  });
+
+  it("flags a post with a reason, remembers it, and lets you remove it", async () => {
+    const user = userEvent.setup();
+    const first = render(
+      <StoreProvider>
+        <LiveCard id="r-001" />
+      </StoreProvider>,
+    );
+    await user.click(screen.getByRole("button", { name: "Flag as fake or wrong" }));
+    const sheet = screen.getByRole("dialog", { name: /what's wrong with this post/i });
+    const submit = within(sheet).getByRole("button", { name: "Flag post" });
+    expect(submit).toBeDisabled();
+    await user.click(within(sheet).getByRole("radio", { name: /wrong location/i }));
+    await user.click(submit);
+
+    const thanks = screen.getByRole("dialog", { name: /thanks for flagging/i });
+    expect(within(thanks).getByText(/if 2 more people flag it/i)).toBeInTheDocument();
+    await user.click(within(thanks).getByRole("button", { name: "Done" }));
+    expect(
+      screen.getByRole("button", { name: /flagged as fake or wrong \(change\)/i }),
+    ).toHaveAttribute("aria-pressed", "true");
+    first.unmount();
+
+    // Still flagged after a reload; reopen and remove it.
+    render(
+      <StoreProvider>
+        <LiveCard id="r-001" />
+      </StoreProvider>,
+    );
+    await user.click(screen.getByRole("button", { name: /flagged as fake or wrong/i }));
+    const again = screen.getByRole("dialog", { name: /what's wrong with this post/i });
+    expect(within(again).getByRole("radio", { name: /wrong location/i })).toBeChecked();
+    await user.click(within(again).getByRole("button", { name: "Remove my flag" }));
+    expect(screen.getByRole("button", { name: "Flag as fake or wrong" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
+  it("marks a post Disputed when enough people flag it", () => {
+    render(
+      <StoreProvider>
+        <LiveCard id="r-007" />
+      </StoreProvider>,
+    );
+    expect(screen.getByRole("note")).toHaveTextContent(
+      /disputed · 4 people flagged this as fake or wrong/i,
+    );
+  });
+});

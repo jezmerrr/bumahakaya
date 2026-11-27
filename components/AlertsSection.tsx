@@ -72,17 +72,23 @@ const CATEGORY: Record<
 type Filter = AlertCategory | "all";
 
 export function AlertsSection({ onOpenMap }: { onOpenMap?: () => void }) {
-  const { announcements, reports, sensors } = useStore();
+  const { announcements, reports, sensors, isDisputed } = useStore();
   const [filter, setFilter] = useState<Filter>("all");
   const [openId, setOpenId] = useState<string | null>(null);
 
-  // Live status from reports + sensors, the same numbers as the Home card.
+  // Live status from reports + sensors, the same numbers as the Home card
+  // (Disputed reports left out).
   const status = useMemo(
     () =>
       areaStatus(
-        nearbyItems([...reports, ...sensors], DLSU_CENTER, RADIUS_M, null),
+        nearbyItems(
+          [...reports, ...sensors].filter((m) => !isDisputed(m)),
+          DLSU_CENTER,
+          RADIUS_M,
+          null,
+        ),
       ),
-    [reports, sensors],
+    [reports, sensors, isDisputed],
   );
 
   const counts = useMemo(() => {

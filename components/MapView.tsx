@@ -23,11 +23,13 @@ const SENSOR_SVG =
 
 type Kind = "sensor" | "community";
 
-function makePin(severity: Severity, kind: Kind, selected: boolean) {
+function makePin(severity: Severity, kind: Kind, selected: boolean, faded = false) {
   const size = selected ? 44 : 34;
   return divIcon({
     className: "map-pin-wrap",
-    html: `<span class="map-pin${selected ? " map-pin-selected" : ""}" style="--pin:${severityColor(
+    html: `<span class="map-pin${selected ? " map-pin-selected" : ""}${
+      faded ? " map-pin-faded" : ""
+    }" style="--pin:${severityColor(
       severity,
     )}">${kind === "sensor" ? SENSOR_SVG : PERSON_SVG}</span>`,
     iconSize: [size, size],
@@ -42,6 +44,9 @@ for (const s of ["Passable", "Caution", "Impassable"] as Severity[]) {
   for (const k of ["sensor", "community"] as Kind[]) {
     PINS[`${s}-${k}-0`] = makePin(s, k, false);
     PINS[`${s}-${k}-1`] = makePin(s, k, true);
+    // Disputed (flagged as fake or wrong) reports
+    PINS[`${s}-${k}-0-f`] = makePin(s, k, false, true);
+    PINS[`${s}-${k}-1-f`] = makePin(s, k, true, true);
   }
 }
 
@@ -67,12 +72,15 @@ export default function MapView({
   onMap,
   zoom = 16,
   interactive = true,
+  fadedIds,
 }: {
   center: LatLng;
   markers: Report[];
   zoom?: number;
   // false = a still preview (no dragging or zooming), e.g. on Home.
   interactive?: boolean;
+  // Reports shown faded (Disputed: flagged as fake or wrong).
+  fadedIds?: Set<string>;
   // Optional: the Business Dashboard shows the map without selection.
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
@@ -138,8 +146,14 @@ export default function MapView({
           <Marker
             key={m.id}
             position={[m.lat, m.lng]}
-            icon={PINS[`${m.severity}-${kind}-${selected ? 1 : 0}`]}
-            title={`${title}, ${severityShort(m.severity)}`}
+            icon={
+              PINS[
+                `${m.severity}-${kind}-${selected ? 1 : 0}${fadedIds?.has(m.id) ? "-f" : ""}`
+              ]
+            }
+            title={`${title}, ${severityShort(m.severity)}${
+              fadedIds?.has(m.id) ? " (disputed)" : ""
+            }`}
             zIndexOffset={selected ? 1000 : kind === "sensor" ? 100 : 0}
             // Pins are only tappable (and focusable) when selection is on.
             interactive={onSelect != null}

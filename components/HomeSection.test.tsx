@@ -1,5 +1,5 @@
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
@@ -36,6 +36,11 @@ async function withFilters(user: User, pick: (panel: HTMLElement) => Promise<voi
   await user.click(within(panel).getByRole("button", { name: /^show \d+ posts?$/i }));
   expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull();
 }
+
+// Each test starts from the sample data, not what an earlier test saved.
+beforeEach(() => {
+  localStorage.clear();
+});
 
 describe("HomeSection", () => {
   it("shows all posts by default", async () => {
@@ -259,5 +264,17 @@ describe("HomeSection", () => {
     );
     expect(screen.queryByRole("region", { name: "From social media" })).toBeNull();
     expect(screen.getAllByTestId("social-card")).toHaveLength(5);
+  });
+
+  it("leaves disputed reports out of the status card but keeps them in the feed", () => {
+    renderHome();
+    const hero = screen.getByRole("region", { name: /flood status near you/i });
+    // 8 reports + 4 sensors nearby, minus the disputed "Castro St clear".
+    expect(within(hero).getByText("Reports nearby").nextSibling).toHaveTextContent("11");
+    const castro = screen
+      .getAllByTestId("report-card")
+      .find((c) => within(c).queryByText("Castro St clear"));
+    expect(castro).toBeDefined();
+    expect(within(castro!).getByRole("note")).toHaveTextContent(/disputed/i);
   });
 });

@@ -216,3 +216,12 @@ export function CameraIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function FlagIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M5 21V4" />
+      <path d="M5 4h11l-2 4 2 4H5" />
+    </svg>
+  );
+}

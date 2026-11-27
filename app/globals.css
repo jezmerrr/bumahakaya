@@ -348,6 +348,12 @@ body {
     0 0 0 6px color-mix(in srgb, var(--pin) 30%, transparent),
     0 6px 16px rgb(11 37 69 / 0.35);
 }
+/* Disputed reports (flagged as fake or wrong): faded, dashed edge */
+.map-pin-faded {
+  border-style: dashed;
+  opacity: 0.45;
+  filter: grayscale(0.6);
+}
 .map-pin-wrap:focus-visible {
   outline: none;
 }

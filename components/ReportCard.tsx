@@ -9,7 +9,14 @@ import { useAppNav } from "@/lib/nav";
 import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
-import { CameraIcon, CommentIcon, ThumbsUpIcon, UserIcon } from "./icons";
+import { DisputedNotice, FlagSheet } from "./FlagReport";
+import {
+  CameraIcon,
+  CommentIcon,
+  FlagIcon,
+  ThumbsUpIcon,
+  UserIcon,
+} from "./icons";
 import { EditReportSheet, ReportDetail } from "./ReportDetail";
 import { ConfirmDeleteDialog } from "./Sheet";
 import { OwnerActions, SensorBar } from "./ui";
@@ -21,8 +28,15 @@ export function ReportCard({
   report: Report;
   distanceM?: number;
 }) {
-  const { comments, removeReport, confirmCount, isConfirmed, toggleConfirm } =
-    useStore();
+  const {
+    comments,
+    removeReport,
+    confirmCount,
+    isConfirmed,
+    toggleConfirm,
+    myFlag,
+    isDisputed,
+  } = useStore();
   const { showOnMap } = useAppNav();
   const commentCount = comments.filter((c) => c.reportId === report.id).length;
   const isMine =
@@ -35,6 +49,9 @@ export function ReportCard({
   const [detailOpen, setDetailOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [flagging, setFlagging] = useState(false);
+  const flagged = myFlag(report.id) !== null;
+  const disputed = isDisputed(report);
 
   const photoLabelId = useId();
   const title = report.headline ?? report.streetName;
@@ -110,6 +127,12 @@ export function ReportCard({
         </div>
       </div>
 
+      {disputed ? (
+        <div className="mx-3.5 mt-2.5">
+          <DisputedNotice report={report} />
+        </div>
+      ) : null}
+
       {report.sensorCm != null ? (
         <div className="mt-2.5 pl-[4.375rem] pr-3.5">
           <SensorBar
@@ -155,7 +178,23 @@ export function ReportCard({
             onEdit={() => setEditing(true)}
             onDelete={() => setConfirmingDelete(true)}
           />
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            onClick={() => setFlagging(true)}
+            aria-haspopup="dialog"
+            aria-pressed={flagged}
+            aria-label={flagged ? "Flagged as fake or wrong (change)" : "Flag as fake or wrong"}
+            title={flagged ? "You flagged this post" : "Flag as fake or wrong"}
+            className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${
+              flagged
+                ? "bg-impass/10 text-[color:var(--sev-ink-impass)]"
+                : "text-ink/60 hover:bg-ink/5"
+            }`}
+          >
+            <FlagIcon className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {commentsOpen ? (
@@ -178,6 +217,9 @@ export function ReportCard({
       ) : null}
       {editing ? (
         <EditReportSheet report={report} onClose={() => setEditing(false)} />
+      ) : null}
+      {flagging ? (
+        <FlagSheet report={report} onClose={() => setFlagging(false)} />
       ) : null}
       {confirmingDelete ? (
         <ConfirmDeleteDialog
