@@ -23,11 +23,19 @@ import {
   seedSocial,
 } from "@/data/seed";
 import { CURRENT_USER } from "./user";
+import { isDisputedCount, type FlagReason } from "./flags";
 
 const REPORTS_KEY = "bk.reports.v1";
 const COMMENTS_KEY = "bk.comments.v1";
 // Ids of reports the current user confirmed (one vote per person per report).
 const CONFIRMS_KEY = "bk.confirms.v1";
+// Reports the current user flagged as fake or wrong, with the reason.
+const FLAGS_KEY = "bk.flags.v1";
+
+interface MyFlag {
+  reportId: string;
+  reason: FlagReason;
+}
 
 export type NewReport = Omit<Report, "id" | "timestamp" | "source">;
 export type ReportChanges = Partial<
@@ -50,6 +58,13 @@ interface StoreValue {
   // Seed confirmations plus the current user's own vote, if any.
   confirmCount: (report: Report) => number;
   toggleConfirm: (reportId: string) => void;
+  // The reason the current user flagged this report, or null.
+  myFlag: (reportId: string) => FlagReason | null;
+  // Seed flags plus the current user's own flag, if any.
+  flagCount: (report: Report) => number;
+  isDisputed: (report: Report) => boolean;
+  flagReport: (reportId: string, reason: FlagReason) => void;
+  unflagReport: (reportId: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -117,6 +132,44 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       (report.confirms ?? 0) + (confirmedIds.includes(report.id) ? 1 : 0),
     [confirmedIds],
   );
+
+  const [myFlags, setMyFlags] = useState<MyFlag[]>(() =>
+    loadJSON<MyFlag>(FLAGS_KEY, []),
+  );
+
+  const myFlag = useCallback(
+    (reportId: string) =>
+      myFlags.find((f) => f.reportId === reportId)?.reason ?? null,
+    [myFlags],
+  );
+
+  const flagCount = useCallback(
+    (report: Report) =>
+      (report.flags ?? 0) + (myFlags.some((f) => f.reportId === report.id) ? 1 : 0),
+    [myFlags],
+  );
+
+  const isDisputed = useCallback(
+    (report: Report) => isDisputedCount(flagCount(report)),
+    [flagCount],
+  );
+
+  // One flag per person per report; flagging again just changes the reason.
+  const flagReport = useCallback((reportId: string, reason: FlagReason) => {
+    setMyFlags((prev) => {
+      const next = [...prev.filter((f) => f.reportId !== reportId), { reportId, reason }];
+      save(FLAGS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const unflagReport = useCallback((reportId: string) => {
+    setMyFlags((prev) => {
+      const next = prev.filter((f) => f.reportId !== reportId);
+      save(FLAGS_KEY, next);
+      return next;
+    });
+  }, []);
 
   const toggleConfirm = useCallback((reportId: string) => {
     setConfirmedIds((prev) => {
@@ -201,6 +254,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     isConfirmed,
     confirmCount,
     toggleConfirm,
+    myFlag,
+    flagCount,
+    isDisputed,
+    flagReport,
+    unflagReport,
   };
 
   return (

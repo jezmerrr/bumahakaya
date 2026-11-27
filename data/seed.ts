@@ -135,6 +135,8 @@ export const seedReports: Report[] = [
     sensorCm: 3,
     trend: "steady",
     confirms: 5,
+    // Demo: neighbors say Castro St is flooded after all.
+    flags: 4,
     comments: 0,
     source: "community",
     timestamp: minsAgo(52),

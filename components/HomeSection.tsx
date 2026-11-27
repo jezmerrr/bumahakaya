@@ -28,17 +28,24 @@ const SOURCES: Source[] = ["All", "Community", "Social"];
 const CONDITIONS: Severity[] = ["Impassable", "Caution", "Passable"];
 
 export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
-  const { reports, sensors, social } = useStore();
+  const { reports, sensors, social, isDisputed } = useStore();
   const [source, setSource] = useState<Source>("All");
   const [severity, setSeverity] = useState<Severity | null>(null);
   const [query, setQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Status card: everything reported within 700 m, reports and sensors.
+  // Status card: everything reported within 700 m, reports and sensors,
+  // leaving out reports people flagged as fake or wrong (Disputed).
   const all = useMemo(() => [...reports, ...sensors], [reports, sensors]);
   const nearby = useMemo(
-    () => nearbyItems(all, DLSU_CENTER, RADIUS_M, null),
-    [all],
+    () =>
+      nearbyItems(
+        all.filter((m) => !isDisputed(m)),
+        DLSU_CENTER,
+        RADIUS_M,
+        null,
+      ),
+    [all, isDisputed],
   );
 
   const sortedReports = useMemo(

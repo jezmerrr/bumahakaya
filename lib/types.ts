@@ -29,6 +29,8 @@ export interface Report {
   sensorCm?: number;
   trend?: Trend;
   confirms?: number;
+  // Times other people flagged this report as fake or wrong (seed data).
+  flags?: number;
   comments?: number;
   // Set when the author edits the report after posting.
   editedAt?: string;

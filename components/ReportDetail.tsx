@@ -10,7 +10,8 @@ import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
 import { DemoDataBadge } from "./DemoDataBadge";
 import { FloodScene } from "./FloodScene";
-import { MapPinIcon, ThumbsUpIcon } from "./icons";
+import { DisputedNotice, FlagSheet } from "./FlagReport";
+import { FlagIcon, MapPinIcon, ThumbsUpIcon } from "./icons";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
 import { ConfirmDeleteDialog, Sheet } from "./Sheet";
 import {
@@ -41,7 +42,10 @@ export function ReportDetail({
   // Open the Maps tab with this report selected.
   onShowOnMap?: () => void;
 }) {
-  const { comments, confirmCount, isConfirmed, toggleConfirm } = useStore();
+  const { comments, confirmCount, isConfirmed, toggleConfirm, myFlag, isDisputed } =
+    useStore();
+  const [flagging, setFlagging] = useState(false);
+  const flagged = myFlag(report.id) !== null;
   const confirms = confirmCount(report);
   const confirmed = isConfirmed(report.id);
   const commentCount = comments.filter((c) => c.reportId === report.id).length;
@@ -77,6 +81,8 @@ export function ReportDetail({
         ) : null}
 
         <FloodScene level={report.waterLevel} severity={report.severity} />
+
+        {isDisputed(report) ? <DisputedNotice report={report} /> : null}
 
         <section className="rounded-3xl bg-surface p-4 shadow-sm">
           <div className="flex items-center gap-3">
@@ -170,6 +176,19 @@ export function ReportDetail({
           <p className="-mt-1 text-center text-xs text-ink/60">
             Others confirm your report when they see the same flooding.
           </p>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setFlagging(true)}
+            aria-haspopup="dialog"
+            className="-mt-1 flex w-full items-center justify-center gap-1.5 py-2 text-xs font-semibold text-ink/65 hover:text-[color:var(--sev-ink-impass)]"
+          >
+            <FlagIcon className="h-3.5 w-3.5" />
+            {flagged ? "You flagged this post · change" : "Flag as fake or wrong"}
+          </button>
+        )}
+        {flagging ? (
+          <FlagSheet report={report} onClose={() => setFlagging(false)} />
         ) : null}
 
         <section className="rounded-3xl bg-surface p-4 shadow-sm">

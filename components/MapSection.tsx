@@ -69,7 +69,7 @@ export function MapSection({
   // Open with this report/sensor selected and zoomed in ("Show on map").
   focusId?: string | null;
 }) {
-  const { reports, sensors } = useStore();
+  const { reports, sensors, isDisputed } = useStore();
   const [view, setView] = useState<"map" | "list">("map");
   const [severity, setSeverity] = useState<Severity | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(focusId);
@@ -85,7 +85,12 @@ export function MapSection({
     () => nearbyItems(all, DLSU_CENTER, RADIUS_M, severity),
     [all, severity],
   );
-  const summary = summarize(nearby);
+  // Disputed reports stay on the map (faded) but don't count in the summary.
+  const summary = summarize(nearby.filter((i) => !isDisputed(i.report)));
+  const disputedIds = useMemo(
+    () => new Set(all.filter((m) => isDisputed(m)).map((m) => m.id)),
+    [all, isDisputed],
+  );
   const counts = countBySeverity(all);
   const newest = newestTimestamp(all);
 
@@ -135,6 +140,7 @@ export function MapSection({
             center={selected ? { lat: selected.lat, lng: selected.lng } : DLSU_CENTER}
             zoom={selected ? 17 : 16}
             markers={shown}
+            fadedIds={disputedIds}
             selectedId={selected?.id ?? null}
             onSelect={select}
             onMap={setMap}
