@@ -142,6 +142,14 @@ describe("HomeSection", () => {
       screen.getByRole("button", { name: "Flooding Taft Ave cor. Estrada" }),
     );
     const dialog = screen.getByRole("dialog", { name: /report details/i });
+    // The flood illustration matches the report: knee-deep, not passable.
+    expect(
+      within(dialog).getByRole("img", { name: /knee-deep floodwater/i }),
+    ).toBeInTheDocument();
+    expect(within(dialog).getByTestId("flood-scene")).toHaveAttribute(
+      "data-severity",
+      "Impassable",
+    );
     expect(within(dialog).getByText("Knee-deep")).toBeInTheDocument();
     expect(
       within(dialog).getByText("Hindi madaanan / Not passable"),
