@@ -1,15 +1,17 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
+import { useState } from "react";
 import { severityLabel, waterLevelLabel } from "@/lib/severity";
 import { formatDateTime, relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
 import { useStore } from "@/lib/store";
+import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
 import { FloodScene } from "./FloodScene";
 import { ThumbsUpIcon } from "./icons";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
-import { Sheet } from "./Sheet";
+import { ConfirmDeleteDialog, Sheet } from "./Sheet";
 import {
   Avatar,
   formatDistance,
@@ -70,7 +72,8 @@ export function ReportDetail({
             <Avatar name={report.author ?? report.streetName} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-navy">
-                {report.author ?? "Anonymous"}
+                {report.author ??
+                  (report.source === "sensor" ? "FloodWatch sensor" : "Anonymous")}
               </p>
               <p className="text-xs text-navy/50">
                 <time dateTime={report.timestamp}>
@@ -147,6 +150,60 @@ export function ReportDetail({
         </section>
       </div>
     </Sheet>
+  );
+}
+
+// The details page on its own (opened from the map), with the same confirm,
+// edit, and delete behavior as opening it from a feed card.
+export function ReportDetailPage({
+  report,
+  distanceM,
+  onClose,
+}: {
+  report: Report;
+  distanceM?: number;
+  onClose: () => void;
+}) {
+  const { removeReport } = useStore();
+  const isMine =
+    report.source === "community" && report.author === CURRENT_USER.handle;
+  const [confirms, setConfirms] = useState(report.confirms ?? 0);
+  const [confirmed, setConfirmed] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  return (
+    <>
+      <ReportDetail
+        report={report}
+        distanceM={distanceM}
+        confirms={confirms}
+        confirmed={confirmed}
+        onToggleConfirm={() => {
+          setConfirms((c) => c + (confirmed ? -1 : 1));
+          setConfirmed((v) => !v);
+        }}
+        isMine={isMine}
+        onEdit={() => setEditing(true)}
+        onDelete={() => setConfirmingDelete(true)}
+        onClose={onClose}
+      />
+      {editing ? (
+        <EditReportSheet report={report} onClose={() => setEditing(false)} />
+      ) : null}
+      {confirmingDelete ? (
+        <ConfirmDeleteDialog
+          title="Delete this report?"
+          message="It will be removed from the feed and from My reports. This can't be undone."
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={() => {
+            setConfirmingDelete(false);
+            removeReport(report.id);
+            onClose();
+          }}
+        />
+      ) : null}
+    </>
   );
 }
 

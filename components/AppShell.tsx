@@ -36,6 +36,8 @@ export function AppShell() {
     return <StartScreen onStart={() => setStarted(true)} />;
   }
 
+  const fullScreen = tab === "Maps";
+
   const sections: Record<TabKey, ReactNode> = {
     Home: <HomeSection />,
     Maps: <MapSection />,
@@ -54,7 +56,12 @@ export function AppShell() {
   };
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-md flex-col bg-mist">
+    <div
+      className={`mx-auto flex w-full max-w-md flex-col bg-mist ${
+        // The map fills the screen below the header, behind the bottom nav.
+        fullScreen ? "h-dvh overflow-hidden" : "min-h-full"
+      }`}
+    >
       <header className="bg-navy px-4 py-3">
         <Logo variant="dark" />
       </header>
@@ -65,7 +72,9 @@ export function AppShell() {
         them.
       </p>
 
-      <main className="flex-1 pb-24">{sections[tab]}</main>
+      <main className={fullScreen ? "relative min-h-0 flex-1" : "flex-1 pb-24"}>
+        {sections[tab]}
+      </main>
 
       <nav className="fixed inset-x-0 bottom-0 z-[1000] mx-auto flex w-full max-w-md items-center justify-between border-t border-navy/10 bg-white px-5 py-2">
         {NAV.slice(0, 2).map(({ key, Icon }) => (
