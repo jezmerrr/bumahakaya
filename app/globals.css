@@ -216,3 +216,109 @@ body {
     opacity: 0;
   }
 }
+
+/* Modern map (components/MapView.tsx): softened OpenStreetMap tiles, round pins,
+   a pulsing "you are here" dot, and a pill label on the selected pin. */
+.map-modern.leaflet-container {
+  background: #fff;
+  font-family: inherit;
+}
+/* Softer basemap: keep OSM's colors and contrast, just slightly lighter so
+   the flood pins stand out. (Lower contrast turns it grey; much lower
+   opacity washes it out.) */
+.map-modern .leaflet-tile-pane {
+  filter: saturate(0.8) brightness(1.02);
+  opacity: 0.8;
+}
+.map-modern .leaflet-control-attribution {
+  margin: 0;
+  border-bottom-left-radius: 10px;
+  background: rgb(255 255 255 / 0.7);
+  padding: 1px 8px;
+  font-size: 10px;
+  color: rgb(11 37 69 / 0.7);
+  backdrop-filter: blur(6px);
+}
+.map-pin-wrap {
+  border: 0;
+  background: none;
+}
+.map-pin {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 3px solid #fff;
+  border-radius: 9999px;
+  background: var(--pin);
+  color: #fff;
+  box-shadow: 0 4px 12px rgb(11 37 69 / 0.28);
+}
+.map-pin svg {
+  width: 52%;
+  height: 52%;
+}
+.map-pin-selected {
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--pin) 30%, transparent),
+    0 6px 16px rgb(11 37 69 / 0.35);
+}
+.map-pin-wrap:focus-visible {
+  outline: none;
+}
+.map-pin-wrap:focus-visible .map-pin {
+  outline: 3px solid #1e6fd9;
+  outline-offset: 2px;
+}
+.map-you {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.map-you-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgb(30 111 217 / 0.25);
+}
+.map-you-dot {
+  position: absolute;
+  inset: 5px;
+  border: 3px solid #fff;
+  border-radius: 9999px;
+  background: #1e6fd9;
+  box-shadow: 0 2px 6px rgb(11 37 69 / 0.3);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .map-you-pulse {
+    animation: map-pulse 2s ease-out infinite;
+  }
+}
+@keyframes map-pulse {
+  from {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.leaflet-tooltip.map-chip {
+  max-width: 220px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 9999px;
+  background: #1e6fd9;
+  padding: 4px 10px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgb(11 37 69 / 0.25);
+}
+.leaflet-tooltip-top.map-chip::before {
+  border-top-color: #1e6fd9;
+}
