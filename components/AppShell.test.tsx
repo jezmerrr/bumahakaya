@@ -44,7 +44,7 @@ describe("AppShell", () => {
     const user = await enterApp();
     await user.click(screen.getByRole("button", { name: "Alerts" }));
     expect(
-      screen.getByText(/Flood warnings near you/i),
+      screen.getByText(/Official advisories for DLSU and nearby streets/i),
     ).toBeInTheDocument();
   });
 
