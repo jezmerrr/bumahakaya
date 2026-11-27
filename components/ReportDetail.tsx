@@ -6,6 +6,7 @@ import { formatDateTime, relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { CommentThread } from "./CommentThread";
+import { FloodScene } from "./FloodScene";
 import { ThumbsUpIcon } from "./icons";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
 import { Sheet } from "./Sheet";
@@ -54,6 +55,8 @@ export function ReportDetail({
       }
     >
       <div className="space-y-3">
+        <FloodScene level={report.waterLevel} severity={report.severity} />
+
         {report.photoUrl ? (
           <img
             src={report.photoUrl}

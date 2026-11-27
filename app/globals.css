@@ -41,3 +41,178 @@ body {
   color: var(--color-navy);
   font-family: var(--font-sans);
 }
+
+/* Flood scene on the report details page (components/FloodScene.tsx).
+   Everything moves only if the user hasn't asked for reduced motion; without
+   motion the scene still shows the final water level, car, and person. */
+@media (prefers-reduced-motion: no-preference) {
+  .flood-water {
+    animation: flood-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .flood-wave {
+    animation: flood-wave 3s linear infinite;
+  }
+  .flood-wave-back {
+    animation: flood-wave 4.5s linear infinite reverse;
+  }
+  .flood-drive {
+    animation: flood-drive 7s linear infinite;
+  }
+  .flood-drive-slow {
+    animation: flood-drive 14s linear infinite;
+  }
+  .flood-float {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: flood-float 3s ease-in-out infinite;
+  }
+  .flood-wheel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: flood-spin 0.6s linear infinite;
+  }
+  .flood-wheel-slow {
+    animation-duration: 1.6s;
+  }
+  .flood-wake {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: flood-wake 1.2s ease-out infinite;
+  }
+  .flood-blink {
+    animation: flood-blink 1s step-end infinite;
+  }
+  .flood-bob {
+    animation: flood-bob 0.8s ease-in-out infinite alternate;
+  }
+  .flood-leg-a,
+  .flood-leg-b {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: flood-step 0.8s ease-in-out infinite alternate;
+  }
+  .flood-leg-b {
+    animation-direction: alternate-reverse;
+  }
+  .flood-leg-slow {
+    animation-duration: 1.6s;
+  }
+  .flood-sway {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: flood-sway 2.4s ease-in-out infinite alternate;
+  }
+  .flood-rain {
+    animation: flood-rain 0.9s linear infinite;
+  }
+  .flood-ripple {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: flood-wake 1.6s ease-out infinite;
+  }
+  .flood-drift {
+    animation: flood-drift 11s linear infinite;
+  }
+  .flood-current {
+    animation: flood-drift 2.2s linear infinite;
+  }
+  .flood-spray {
+    animation: flood-spray 0.9s ease-out infinite;
+  }
+}
+
+@keyframes flood-rise {
+  from {
+    transform: translateY(var(--flood-rise, 40px));
+  }
+}
+@keyframes flood-wave {
+  to {
+    transform: translateX(-60px);
+  }
+}
+@keyframes flood-drive {
+  from {
+    transform: translateX(-310px);
+  }
+  to {
+    transform: translateX(200px);
+  }
+}
+@keyframes flood-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(2deg);
+  }
+}
+@keyframes flood-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes flood-wake {
+  from {
+    opacity: 0.9;
+    transform: scaleX(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scaleX(1.5);
+  }
+}
+@keyframes flood-blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+@keyframes flood-bob {
+  to {
+    transform: translateY(-1.5px);
+  }
+}
+@keyframes flood-step {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+@keyframes flood-sway {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+@keyframes flood-rain {
+  from {
+    transform: translate(6px, -30px);
+  }
+  to {
+    transform: translate(-14px, 210px);
+  }
+}
+/* Drifts across the whole scene wherever the item starts (--drift-x). */
+@keyframes flood-drift {
+  from {
+    transform: translateX(calc(-80px - var(--drift-x, 0px)));
+  }
+  to {
+    transform: translateX(calc(420px - var(--drift-x, 0px)));
+  }
+}
+@keyframes flood-spray {
+  from {
+    transform: translate(0, 0);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(var(--sx, -14px), var(--sy, -12px));
+    opacity: 0;
+  }
+}
