@@ -26,3 +26,17 @@ const DATE_TIME = new Intl.DateTimeFormat("en-PH", {
 export function formatDateTime(iso: string): string {
   return DATE_TIME.format(new Date(iso));
 }
+
+const MANILA_HOUR = new Intl.DateTimeFormat("en-PH", {
+  hour: "numeric",
+  hourCycle: "h23",
+  timeZone: "Asia/Manila",
+});
+
+// "Magandang umaga / hapon / gabi" for the current time in Manila.
+export function greeting(now: Date = new Date()): string {
+  const hour = Number(MANILA_HOUR.format(now));
+  if (hour >= 5 && hour < 12) return "Magandang umaga";
+  if (hour >= 12 && hour < 18) return "Magandang hapon";
+  return "Magandang gabi";
+}

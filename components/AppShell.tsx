@@ -39,7 +39,7 @@ export function AppShell() {
   const fullScreen = tab === "Maps";
 
   const sections: Record<TabKey, ReactNode> = {
-    Home: <HomeSection />,
+    Home: <HomeSection onOpenMap={() => setTab("Maps")} />,
     Maps: <MapSection />,
     Report: <ReportSection onPosted={() => setTab("Home")} />,
     Alerts: <AlertsSection />,
@@ -66,7 +66,7 @@ export function AppShell() {
         <Logo variant="dark" />
       </header>
 
-      <p className="bg-amber/10 px-4 py-1.5 text-[11px] leading-snug text-navy/70">
+      <p className="border-b border-amber/30 bg-[#fbe3b9] px-4 py-1.5 text-[11px] leading-snug text-navy/70">
         Heads up, this is a demo. Always follow official PAGASA and LGU
         advisories. BumahaKaya? helps you check your street, it does not replace
         them.
@@ -127,7 +127,7 @@ function NavButton({
       onClick={onClick}
       aria-pressed={active}
       className={`flex flex-col items-center gap-0.5 text-[11px] font-semibold ${
-        active ? "text-signal" : "text-navy/50"
+        active ? "text-signal" : "text-navy/65"
       }`}
     >
       <Icon className="h-5 w-5" />

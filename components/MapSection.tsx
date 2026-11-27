@@ -12,7 +12,12 @@ import {
   summarize,
   type NearbyItem,
 } from "@/lib/mapSummary";
-import { severityColor, severityShort, waterLevelLabel } from "@/lib/severity";
+import {
+  severityColor,
+  severityInk,
+  severityShort,
+  waterLevelLabel,
+} from "@/lib/severity";
 import { relativeTime } from "@/lib/time";
 import type { Report, Severity } from "@/lib/types";
 import {
@@ -44,7 +49,7 @@ const GLASS_CHIP =
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-full w-full place-items-center bg-white text-sm text-navy/50">
+    <div className="grid h-full w-full place-items-center bg-white text-sm text-navy/65">
       Loading map…
     </div>
   ),
@@ -144,7 +149,7 @@ export function MapSection() {
           <h1 className="font-display text-lg font-extrabold leading-tight text-navy">
             Flood map
           </h1>
-          <p className="text-xs text-navy/60">
+          <p className="text-xs text-navy/70">
             Near DLSU-Manila
             {newest ? ` · Updated ${relativeTime(newest)}` : ""}
           </p>
@@ -157,13 +162,14 @@ export function MapSection() {
           {CONDITIONS.map((s) => {
             const active = s === severity;
             const color = severityColor(s);
+            const ink = severityInk(s);
             return (
               <button
                 key={s}
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSeverity(active ? null : s)}
-                style={active ? { backgroundColor: color, borderColor: color } : undefined}
+                style={active ? { backgroundColor: ink, borderColor: ink } : undefined}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-semibold ${
                   active ? "text-white shadow-md" : `text-navy/80 ${GLASS_CHIP}`
                 }`}
@@ -174,7 +180,7 @@ export function MapSection() {
                   style={{ backgroundColor: active ? "#fff" : color }}
                 />
                 {severityShort(s)}
-                <span className={active ? "text-white/80" : "text-navy/50"}>
+                <span className={active ? "text-white/80" : "text-navy/65"}>
                   {counts[s]}
                 </span>
               </button>
@@ -224,7 +230,7 @@ export function MapSection() {
                 aria-pressed={active}
                 onClick={() => setView(key)}
                 className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold ${
-                  active ? "bg-navy text-white" : "text-navy/60"
+                  active ? "bg-navy text-white" : "text-navy/70"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -300,7 +306,7 @@ function SummaryCard({
     : `Reports within ${RADIUS_M} m`;
   return (
     <section aria-label="Nearby summary" className={`w-full rounded-3xl p-4 ${GLASS}`}>
-      <p className="text-xs font-semibold text-navy/60">{heading}</p>
+      <p className="text-xs font-semibold text-navy/70">{heading}</p>
       <p className="font-display text-4xl font-extrabold leading-tight text-navy">
         {summary?.count ?? 0}
       </p>
@@ -323,7 +329,7 @@ function SummaryCard({
           />
         </div>
       ) : (
-        <p className="mt-1 text-sm text-navy/60">
+        <p className="mt-1 text-sm text-navy/70">
           Walang reports dito ngayon. Try another filter.
         </p>
       )}
@@ -347,7 +353,7 @@ function Stat({
       aria-label={`${label}: ${value}. Show on map`}
       className="rounded-2xl bg-white/60 px-2.5 py-2 text-left hover:bg-white active:bg-navy/5"
     >
-      <span className="block text-[11px] text-navy/60">{label}</span>
+      <span className="block text-[11px] text-navy/70">{label}</span>
       <span className="block truncate text-sm font-semibold text-navy">
         {value}
       </span>
@@ -368,6 +374,7 @@ function SelectedCard({
 }) {
   const sensor = report.source === "sensor";
   const color = severityColor(report.severity);
+  const ink = severityInk(report.severity);
   const Icon = sensor ? WavesIcon : UserIcon;
   return (
     <section
@@ -377,12 +384,12 @@ function SelectedCard({
       <div className="flex items-start gap-3">
         <span
           className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl"
-          style={{ backgroundColor: `${color}1f`, color }}
+          style={{ backgroundColor: `${color}1f`, color: ink }}
         >
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-navy/50">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-navy/65">
             {sensor ? "FloodWatch sensor" : "Community report"} ·{" "}
             {relativeTime(report.timestamp)}
           </p>
@@ -391,7 +398,7 @@ function SelectedCard({
           </h2>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <StatusPill severity={report.severity} />
-            <span className="text-xs text-navy/60">
+            <span className="text-xs text-navy/70">
               {waterLevelLabel(report.waterLevel)}
               {distanceM != null ? ` · ${formatDistance(distanceM)} away` : ""}
             </span>
@@ -401,7 +408,7 @@ function SelectedCard({
           type="button"
           aria-label="Close preview"
           onClick={onClose}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy/5 text-navy/60"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy/5 text-navy/70"
         >
           <XIcon className="h-4 w-4" />
         </button>
@@ -429,12 +436,12 @@ function NearbyList({
   return (
     // Padding leaves room for the floating title/chips and bottom switch.
     <div className="absolute inset-0 overflow-y-auto bg-mist px-3 pb-40 pt-[124px]">
-      <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-navy/50">
+      <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-navy/65">
         {items.length} {severity ? severityShort(severity).toLowerCase() : ""}{" "}
         {items.length === 1 ? "report" : "reports"} within {RADIUS_M} m
       </h2>
       {items.length === 0 ? (
-        <p className="rounded-3xl bg-white p-6 text-center text-sm text-navy/60 shadow-sm">
+        <p className="rounded-3xl bg-white p-6 text-center text-sm text-navy/70 shadow-sm">
           Walang reports dito ngayon. Try another filter.
         </p>
       ) : (
@@ -442,6 +449,7 @@ function NearbyList({
           {items.map(({ report, distanceM }) => {
             const sensor = report.source === "sensor";
             const color = severityColor(report.severity);
+            const ink = severityInk(report.severity);
             const Icon = sensor ? WavesIcon : UserIcon;
             return (
               <li key={report.id}>
@@ -452,7 +460,7 @@ function NearbyList({
                 >
                   <span
                     className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-                    style={{ backgroundColor: `${color}1f`, color }}
+                    style={{ backgroundColor: `${color}1f`, color: ink }}
                   >
                     <Icon className="h-5 w-5" />
                   </span>
@@ -460,13 +468,13 @@ function NearbyList({
                     <span className="block truncate text-sm font-semibold text-navy">
                       {report.headline ?? report.streetName}
                     </span>
-                    <span className="block truncate text-xs text-navy/60">
+                    <span className="block truncate text-xs text-navy/70">
                       {severityShort(report.severity)} ·{" "}
                       {waterLevelLabel(report.waterLevel)} ·{" "}
                       {formatDistance(distanceM)} · {relativeTime(report.timestamp)}
                     </span>
                   </span>
-                  <span aria-hidden="true" className="text-navy/30">
+                  <span aria-hidden="true" className="text-navy/45">
                     ›
                   </span>
                 </button>

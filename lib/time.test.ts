@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDateTime, relativeTime } from "./time";
+import { formatDateTime, greeting, relativeTime } from "./time";
 
 const now = new Date("2026-11-24T16:12:00+08:00");
 
@@ -27,5 +27,14 @@ describe("formatDateTime", () => {
     expect(formatDateTime("2026-11-27T16:30:00Z")).toMatch(
       /Nov 28,? 12:30\s?AM/i,
     );
+  });
+});
+
+describe("greeting", () => {
+  it("greets by the time of day in Manila", () => {
+    expect(greeting(new Date("2026-11-28T01:00:00Z"))).toBe("Magandang umaga"); // 9 AM
+    expect(greeting(new Date("2026-11-28T05:00:00Z"))).toBe("Magandang hapon"); // 1 PM
+    expect(greeting(new Date("2026-11-28T12:00:00Z"))).toBe("Magandang gabi"); // 8 PM
+    expect(greeting(new Date("2026-11-27T19:00:00Z"))).toBe("Magandang gabi"); // 3 AM
   });
 });

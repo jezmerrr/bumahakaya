@@ -1,4 +1,4 @@
-import { severityColor, severityShort } from "@/lib/severity";
+import { severityColor, severityInk, severityShort } from "@/lib/severity";
 import type { Severity, Trend } from "@/lib/types";
 import type { ReactNode } from "react";
 import { PencilIcon, TrashIcon } from "./icons";
@@ -30,7 +30,7 @@ export function Avatar({
 export function StatusPill({ severity }: { severity: Severity }) {
   return (
     <span
-      style={{ backgroundColor: severityColor(severity) }}
+      style={{ backgroundColor: severityInk(severity) }}
       className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-white"
     >
       <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
@@ -63,7 +63,7 @@ export function SensorBar({
           className="h-full rounded-full"
         />
       </div>
-      <div className="mt-1 flex items-center justify-between text-[11px] text-navy/60">
+      <div className="mt-1 flex items-center justify-between text-[11px] text-navy/70">
         <span>
           Sensor: {cm} cm{trend ? ` · ${trend}` : ""}
         </span>
@@ -79,11 +79,13 @@ export function IconButton({
   label,
   onClick,
   tone = "neutral",
+  size = "md",
   children,
 }: {
   label: string;
   onClick: () => void;
   tone?: "neutral" | "danger";
+  size?: "sm" | "md";
   children: ReactNode;
 }) {
   return (
@@ -92,10 +94,12 @@ export function IconButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
+      className={`grid shrink-0 place-items-center rounded-full ${
+        size === "sm" ? "h-8 w-8" : "h-9 w-9"
+      } ${
         tone === "danger"
           ? "bg-impass/10 text-impass hover:bg-impass/15"
-          : "bg-navy/5 text-navy/60 hover:bg-navy/10"
+          : "bg-navy/5 text-navy/70 hover:bg-navy/10"
       }`}
     >
       {children}
@@ -107,16 +111,18 @@ export function IconButton({
 export function OwnerActions({
   onEdit,
   onDelete,
+  size = "md",
 }: {
   onEdit: () => void;
   onDelete: () => void;
+  size?: "sm" | "md";
 }) {
   return (
     <div className="flex shrink-0 items-center gap-1.5 self-start">
-      <IconButton label="Edit report" onClick={onEdit}>
+      <IconButton label="Edit report" size={size} onClick={onEdit}>
         <PencilIcon className="h-4 w-4" />
       </IconButton>
-      <IconButton label="Delete report" tone="danger" onClick={onDelete}>
+      <IconButton label="Delete report" tone="danger" size={size} onClick={onDelete}>
         <TrashIcon className="h-4 w-4" />
       </IconButton>
     </div>

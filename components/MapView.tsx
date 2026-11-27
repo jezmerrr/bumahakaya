@@ -65,9 +65,14 @@ export default function MapView({
   selectedId = null,
   onSelect,
   onMap,
+  zoom = 16,
+  interactive = true,
 }: {
   center: LatLng;
   markers: Report[];
+  zoom?: number;
+  // false = a still preview (no dragging or zooming), e.g. on Home.
+  interactive?: boolean;
   // Optional: the Business Dashboard shows the map without selection.
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
@@ -77,10 +82,15 @@ export default function MapView({
     <MapContainer
       ref={onMap}
       center={[center.lat, center.lng]}
-      zoom={16}
+      zoom={zoom}
       zoomControl={false}
       attributionControl={false}
-      scrollWheelZoom
+      scrollWheelZoom={interactive}
+      dragging={interactive}
+      touchZoom={interactive}
+      doubleClickZoom={interactive}
+      boxZoom={interactive}
+      keyboard={interactive}
       className="map-modern h-full w-full"
     >
       {/* Free, keyless OpenStreetMap tiles; softened in CSS (.map-modern). */}

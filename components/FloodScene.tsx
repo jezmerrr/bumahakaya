@@ -269,7 +269,7 @@ export function FloodScene({
         <div>
           <p className="font-display text-sm font-extrabold text-navy">
             {scene.title} · {depth}{" "}
-            <span className="font-sans font-semibold text-navy/60">
+            <span className="font-sans font-semibold text-navy/70">
               ({look.depthNote})
             </span>
           </p>

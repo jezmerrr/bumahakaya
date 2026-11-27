@@ -57,7 +57,7 @@ export function AlertsSection() {
       <h1 className="font-display text-2xl font-extrabold text-navy">
         Alerts
       </h1>
-      <p className="text-sm text-navy/50">Flood warnings near you</p>
+      <p className="text-sm text-navy/65">Flood warnings near you</p>
 
       <div className="mt-4 space-y-3">
         {announcements.map((a) => {
@@ -80,12 +80,12 @@ export function AlertsSection() {
                   <h3 className="font-display text-sm font-extrabold text-navy">
                     {a.title}
                   </h3>
-                  <span className="shrink-0 text-[11px] text-navy/40">
+                  <span className="shrink-0 text-[11px] text-navy/60">
                     {relativeTime(a.timestamp)}
                   </span>
                 </div>
 
-                <p className="mt-1 text-xs leading-relaxed text-navy/60">
+                <p className="mt-1 text-xs leading-relaxed text-navy/70">
                   {a.body}
                 </p>
 
@@ -96,7 +96,7 @@ export function AlertsSection() {
                     {source.label}
                   </span>
 
-                  <span className="text-[11px] font-semibold text-navy/50">
+                  <span className="text-[11px] font-semibold text-navy/65">
                     {a.agency}
                   </span>
 

@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useId, useState, type FormEvent, type ReactNode } from "react";
-import { severityColor, waterLevelLabel } from "@/lib/severity";
+import { severityColor, severityInk, waterLevelLabel } from "@/lib/severity";
 import type { Severity, WaterLevel } from "@/lib/types";
 
 export interface ReportFormValues {
@@ -49,7 +49,7 @@ export function headlineFor(location: string): string {
 }
 
 const labelText =
-  "block text-xs font-semibold uppercase tracking-wide text-navy/50";
+  "block text-xs font-semibold uppercase tracking-wide text-navy/65";
 const sectionLabel = `mt-5 ${labelText}`;
 
 // The flood report form, used both to post a new report (Report tab) and to
@@ -149,6 +149,7 @@ export function ReportForm({
         {ROAD_OPTIONS.map((option) => {
           const active = severity === option.severity;
           const color = severityColor(option.severity);
+          const ink = severityInk(option.severity);
 
           return (
             <button
@@ -158,8 +159,13 @@ export function ReportForm({
               aria-pressed={active}
               style={
                 active
-                  ? { backgroundColor: color, color: "#fff" }
-                  : { backgroundColor: `${color}1a`, color }
+                  ? { backgroundColor: ink, color: "#fff" }
+                  : {
+                      // Tint over white, so the text stays readable on any page color
+                      backgroundColor: "#fff",
+                      backgroundImage: `linear-gradient(${color}1f, ${color}1f)`,
+                      color: ink,
+                    }
               }
               className="rounded-2xl py-3 text-sm font-semibold"
             >
@@ -173,7 +179,7 @@ export function ReportForm({
       <p className={sectionLabel}>Photo</p>
       <label
         htmlFor={`${id}-photo`}
-        className="mt-2 flex min-h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-navy/20 bg-white/50 text-sm text-navy/50"
+        className="mt-2 flex min-h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-navy/20 bg-white/50 text-sm text-navy/65"
       >
         {photoUrl ? (
           <img
@@ -194,7 +200,7 @@ export function ReportForm({
       </label>
       {photoUrl ? (
         <div className="mt-1.5 flex justify-between text-xs">
-          <span className="text-navy/40">Tap the photo to change it</span>
+          <span className="text-navy/60">Tap the photo to change it</span>
           <button
             type="button"
             onClick={() => setPhotoUrl(undefined)}
@@ -229,7 +235,7 @@ export function ReportForm({
         <button
           type="button"
           onClick={onCancel}
-          className="mt-2 w-full rounded-2xl py-3 text-sm font-semibold text-navy/60"
+          className="mt-2 w-full rounded-2xl py-3 text-sm font-semibold text-navy/70"
         >
           Cancel
         </button>

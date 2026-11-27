@@ -34,7 +34,7 @@ export function SocialCard({ post }: { post: SocialPost }) {
         >
           View post
         </a>
-        <span className="text-[11px] text-navy/50">
+        <span className="text-[11px] text-navy/65">
           {relativeTime(post.timestamp)}
         </span>
       </div>

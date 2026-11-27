@@ -75,7 +75,7 @@ export function ReportDetail({
                 {report.author ??
                   (report.source === "sensor" ? "FloodWatch sensor" : "Anonymous")}
               </p>
-              <p className="text-xs text-navy/50">
+              <p className="text-xs text-navy/65">
                 <time dateTime={report.timestamp}>
                   {formatDateTime(report.timestamp)}
                 </time>{" "}
@@ -96,14 +96,14 @@ export function ReportDetail({
               {body}
             </p>
           ) : (
-            <p className="mt-3 text-sm italic text-navy/40">
+            <p className="mt-3 text-sm italic text-navy/60">
               No description added.
             </p>
           )}
         </section>
 
         <section className="rounded-3xl bg-white p-4 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-navy/50">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-navy/65">
             Flood details
           </h3>
           <dl className="mt-1 divide-y divide-navy/10 text-sm">
@@ -143,7 +143,7 @@ export function ReportDetail({
         </button>
 
         <section className="rounded-3xl bg-white p-4 shadow-sm">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-navy/50">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-navy/65">
             Comments ({commentCount})
           </h3>
           <CommentThread reportId={report.id} />
@@ -210,7 +210,7 @@ export function ReportDetailPage({
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-navy/50">{label}</dt>
+      <dt className="shrink-0 text-navy/65">{label}</dt>
       <dd className="text-right font-semibold text-navy">{value}</dd>
     </div>
   );

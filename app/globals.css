@@ -6,12 +6,20 @@
   --color-signal: #1e6fd9;
   --color-aqua: #4fc3e8;
   --color-amber: #e8972a;
-  --color-mist: #f5f8fb;
+  /* "Linen": an almost-white page with a hint of warmth. Cards get their edge
+     from the outlined shadow below rather than from a dark background. */
+  --color-mist: #faf6ef;
+
+  /* Small shadow with a faint navy outline, so white cards stay crisp on a
+     near-white page. Used by every card (shadow-sm). */
+  --shadow-sm: 0 0 0 1px rgb(11 37 69 / 0.07), 0 2px 8px -2px rgb(11 37 69 / 0.1);
 
   /* Road status (in-app) */
   --color-pass: #17845a;
   --color-caution: #e8972a;
   --color-impass: #c93a3a;
+  /* Darker amber for amber text (brand amber is too light to read as text) */
+  --color-amber-ink: #a35f0c;
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;

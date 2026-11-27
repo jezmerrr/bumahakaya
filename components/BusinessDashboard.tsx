@@ -35,7 +35,7 @@ const DLSU_CENTER: LatLng = {
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-full w-full place-items-center text-sm text-navy/50">
+    <div className="grid h-full w-full place-items-center text-sm text-navy/65">
       Loading map...
     </div>
   ),
@@ -124,7 +124,7 @@ export function BusinessDashboard({
         <button
           type="button"
           onClick={onBack}
-          className="text-sm font-semibold text-navy/60"
+          className="text-sm font-semibold text-navy/70"
         >
           ‹ Back
         </button>
@@ -138,14 +138,14 @@ export function BusinessDashboard({
         <h1 className="font-display text-2xl font-extrabold text-navy">
           BumahaKaya
         </h1>
-        <p className="text-xs text-navy/50">
+        <p className="text-xs text-navy/65">
           Business flood monitoring
         </p>
       </div>
 
       {/* Flood Risk */}
       <section className="rounded-2xl bg-white p-4 shadow-sm">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-navy/50">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-navy/65">
           Flood Risk · Taft Avenue
         </p>
 
@@ -159,7 +159,7 @@ export function BusinessDashboard({
               {metrics.highRisk ? "High Risk" : "Moderate Risk"}
             </h2>
 
-            <p className="mt-1 text-xs text-navy/60">
+            <p className="mt-1 text-xs text-navy/70">
               Based on recent sensor readings
             </p>
           </div>
@@ -216,11 +216,11 @@ export function BusinessDashboard({
           />
         </div>
 
-        <p className="mt-2 text-[10px] text-navy/50">
+        <p className="mt-2 text-[10px] text-navy/65">
           Affected zones · Community reports · Sensors
         </p>
 
-        <p className="mt-1 text-[10px] text-navy/40">
+        <p className="mt-1 text-[10px] text-navy/60">
           {nearbyMarkers.length} locations within 700m
         </p>
       </section>
@@ -235,7 +235,7 @@ export function BusinessDashboard({
             className={`rounded-full px-3 py-1 text-xs font-semibold ${
               range === key
                 ? "bg-navy text-white"
-                : "bg-white text-navy/60 border border-navy/10"
+                : "bg-white text-navy/70 border border-navy/10"
             }`}
           >
             {RANGE_LABEL[key]}
@@ -253,13 +253,13 @@ export function BusinessDashboard({
           </span>
         </div>
 
-        <p className="mt-1 text-xs text-navy/50">
+        <p className="mt-1 text-xs text-navy/65">
           Average across all sensors · last {RANGE_LABEL[range]}
         </p>
 
         <TrendChart points={series} threshold={IMPASSABLE_CM} />
 
-        <div className="mt-2 flex items-center gap-3 text-[10px] text-navy/50">
+        <div className="mt-2 flex items-center gap-3 text-[10px] text-navy/65">
           <span className="flex items-center gap-1">
             <span className="h-0.5 w-3 bg-[#247A60]" /> Water level (cm)
           </span>
@@ -273,13 +273,13 @@ export function BusinessDashboard({
       {/* Flood Hotspots */}
       <section className="rounded-2xl border border-navy/10 bg-white p-4">
         <h2 className="font-bold text-navy">Flood hotspots</h2>
-        <p className="mt-1 text-xs text-navy/50">
+        <p className="mt-1 text-xs text-navy/65">
           Streets ranked by flood events · last {RANGE_LABEL[range]}
         </p>
 
         <ol className="mt-3 space-y-2">
           {hotspots.length === 0 && (
-            <li className="text-xs text-navy/40">
+            <li className="text-xs text-navy/60">
               No streets crossed the not-passable level in this period.
             </li>
           )}
@@ -308,7 +308,7 @@ export function BusinessDashboard({
                 <p className="text-sm font-bold text-impass">
                   {h.floodEvents}×
                 </p>
-                <p className="text-[10px] text-navy/50">peak {h.peakCm}cm</p>
+                <p className="text-[10px] text-navy/65">peak {h.peakCm}cm</p>
               </div>
             </li>
           ))}
@@ -318,7 +318,7 @@ export function BusinessDashboard({
       {/* Customized Flood Report */}
       <section className="rounded-2xl border border-navy/10 bg-white p-4">
         <h2 className="font-bold text-navy">Customized flood report</h2>
-        <p className="mt-1 text-xs text-navy/60">
+        <p className="mt-1 text-xs text-navy/70">
           Export the historical sensor data for this period for planning or
           site-risk analysis.
         </p>
@@ -332,7 +332,7 @@ export function BusinessDashboard({
           Generate report · {windowReadings.length} readings (CSV)
         </button>
 
-        <p className="mt-2 text-[10px] text-navy/40">
+        <p className="mt-2 text-[10px] text-navy/60">
           Custom reports priced ₱5,000–₱20,000 per the period and area covered.
         </p>
       </section>
@@ -340,7 +340,7 @@ export function BusinessDashboard({
       {/* Subscription Tiers */}
       <section className="rounded-2xl border border-navy/10 bg-white p-4">
         <h2 className="font-bold text-navy">Dashboard subscription</h2>
-        <p className="mt-1 text-xs text-navy/50">
+        <p className="mt-1 text-xs text-navy/65">
           Monthly monitoring access by organization size.
         </p>
 
@@ -356,10 +356,10 @@ export function BusinessDashboard({
             >
               <div>
                 <p className="flex items-center gap-1.5 text-sm font-semibold text-navy">
-                  {!t.current && <Lock className="h-3 w-3 text-navy/30" />}
+                  {!t.current && <Lock className="h-3 w-3 text-navy/45" />}
                   {t.name}
                 </p>
-                <p className="text-[10px] text-navy/50">{t.who}</p>
+                <p className="text-[10px] text-navy/65">{t.who}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-navy">{t.price}</p>
@@ -368,7 +368,7 @@ export function BusinessDashboard({
                     Current plan
                   </p>
                 ) : (
-                  <p className="text-[10px] text-navy/40">/ month</p>
+                  <p className="text-[10px] text-navy/60">/ month</p>
                 )}
               </div>
             </div>
@@ -376,7 +376,7 @@ export function BusinessDashboard({
         </div>
       </section>
 
-      <p className="text-center text-[10px] text-navy/40">
+      <p className="text-center text-[10px] text-navy/60">
         Business / Institutional Dashboard · Demo data, clearly labeled
       </p>
     </div>
@@ -418,7 +418,7 @@ function TrendChart({
 
   if (points.length < 2) {
     return (
-      <p className="mt-4 text-xs text-navy/40">Not enough data to chart.</p>
+      <p className="mt-4 text-xs text-navy/60">Not enough data to chart.</p>
     );
   }
 
@@ -471,7 +471,7 @@ function MetricCard({
 }) {
   return (
     <div className="rounded-2xl border border-navy/10 bg-white p-3 shadow-sm">
-      <div className="text-navy/40 [&>svg]:h-4 [&>svg]:w-4">
+      <div className="text-navy/60 [&>svg]:h-4 [&>svg]:w-4">
         {icon}
       </div>
 
@@ -479,7 +479,7 @@ function MetricCard({
         {value}
       </p>
 
-      <p className="mt-1 text-xs text-navy/60">
+      <p className="mt-1 text-xs text-navy/70">
         {label}
       </p>
     </div>
