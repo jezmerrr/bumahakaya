@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import type { LatLng } from "@/lib/geo";
 import { CURRENT_USER } from "@/lib/user";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
-
-const DLSU_CENTER: LatLng = { lat: 14.5647, lng: 120.9936 };
 
 export function ReportSection({ onPosted }: { onPosted?: () => void }) {
   const { addReport } = useStore();
@@ -15,8 +12,9 @@ export function ReportSection({ onPosted }: { onPosted?: () => void }) {
 
   function post(values: ReportFormValues) {
     addReport({
-      lat: DLSU_CENTER.lat,
-      lng: DLSU_CENTER.lng,
+      // The form only submits once a pin is set.
+      lat: values.pin!.lat,
+      lng: values.pin!.lng,
       streetName: values.location,
       headline: headlineFor(values.location),
       severity: values.severity,

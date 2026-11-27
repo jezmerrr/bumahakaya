@@ -214,7 +214,7 @@ describe("HomeSection", () => {
     expect(hero).toHaveAttribute("data-status", "Impassable");
 
     // 1. Greeting + freshness
-    expect(within(hero).getByText(/^Magandang (umaga|hapon|gabi), John$/)).toBeInTheDocument();
+    expect(within(hero).getByText(/^Magandang (umaga|hapon|gabi), Juan$/)).toBeInTheDocument();
     expect(within(hero).getByText(/^Updated (just now|\d+[mhd] ago)$/)).toBeInTheDocument();
     // 2. Headline: 4 reports/sensors marked not passable within 700 m
     expect(
@@ -243,5 +243,21 @@ describe("HomeSection", () => {
     for (const card of screen.getAllByTestId("report-card")) {
       expect(within(card).getByText("Not passable")).toBeInTheDocument();
     }
+  });
+
+  it("puts social posts in their own sideways row", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    const row = screen.getByRole("region", { name: "From social media" });
+    expect(within(row).getAllByTestId("social-card")).toHaveLength(5);
+    // Every social card on the page is inside the row.
+    expect(screen.getAllByTestId("social-card")).toHaveLength(5);
+
+    // Showing only social posts lists them full width instead.
+    await withFilters(user, (panel) =>
+      user.click(within(panel).getByRole("button", { name: "Social" })),
+    );
+    expect(screen.queryByRole("region", { name: "From social media" })).toBeNull();
+    expect(screen.getAllByTestId("social-card")).toHaveLength(5);
   });
 });

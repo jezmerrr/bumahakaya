@@ -28,25 +28,37 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
       </p>
 
       {view === "welcome" ? (
-        <div className="mt-10 w-full max-w-xs space-y-3">
-          <button
-            onClick={() => setView("login")}
-            className="w-full rounded-full bg-signal py-3 text-sm font-semibold text-white"
-          >
-            Log in
-          </button>
-          <button
-            onClick={() => setView("signup")}
-            className="w-full rounded-full border border-white/40 py-3 text-sm font-semibold text-white"
-          >
-            Sign up
-          </button>
+        <div className="mt-10 w-full max-w-xs">
+          {/* Guest is the main way in: accounts aren't part of the MVP. */}
           <button
             onClick={onStart}
-            className="w-full py-2 text-sm font-semibold text-white/60"
+            className="w-full rounded-full bg-signal py-3.5 text-base font-semibold text-white shadow-lg"
           >
             Continue as guest
           </button>
+          <p className="mt-2 text-xs text-white/60">
+            No account needed. Reports stay on this phone.
+          </p>
+
+          <div className="mt-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+            <span className="h-px flex-1 bg-white/15" />
+            Accounts preview
+            <span className="h-px flex-1 bg-white/15" />
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setView("login")}
+              className="rounded-full border border-white/30 py-2.5 text-sm font-semibold text-white"
+            >
+              Log in
+            </button>
+            <button
+              onClick={() => setView("signup")}
+              className="rounded-full border border-white/30 py-2.5 text-sm font-semibold text-white"
+            >
+              Sign up
+            </button>
+          </div>
         </div>
       ) : (
         <form onSubmit={enter} className="mt-8 w-full max-w-xs space-y-3 text-left">
@@ -109,7 +121,7 @@ function Field({
         id={id}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-white/15 bg-surface/95 px-3 py-2 text-sm text-ink"
+        className="w-full rounded-xl border border-white/15 bg-surface/95 px-3 py-2 text-base text-ink"
       />
     </label>
   );

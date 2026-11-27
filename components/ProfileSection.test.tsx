@@ -65,4 +65,13 @@ describe("ProfileSection", () => {
     expect(localStorage.getItem("bk.theme.v1")).toBeNull();
     expect(document.documentElement).toHaveAttribute("data-theme", "light");
   });
+
+  it("shows the user's real name, handle, and confirmation count", () => {
+    renderProfile();
+    expect(screen.getByRole("heading", { name: "Juan Ramos" })).toBeInTheDocument();
+    expect(screen.getByText(/@jramos/)).toBeInTheDocument();
+    // Seed: jramos has one report, confirmed 23 times by others.
+    expect(screen.getByText("Confirmations").previousSibling).toHaveTextContent("23");
+    expect(screen.queryByText("Verified")).toBeNull();
+  });
 });

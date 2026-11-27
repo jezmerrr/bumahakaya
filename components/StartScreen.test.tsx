@@ -40,4 +40,11 @@ describe("StartScreen", () => {
     await user.click(screen.getByRole("button", { name: /continue as guest/i }));
     expect(onStart).toHaveBeenCalledTimes(1);
   });
+
+  it("leads with Continue as guest", () => {
+    render(<StartScreen onStart={vi.fn()} />);
+    const buttons = screen.getAllByRole("button").map((b) => b.textContent);
+    expect(buttons[0]).toMatch(/continue as guest/i);
+    expect(screen.getByText(/no account needed/i)).toBeInTheDocument();
+  });
 });

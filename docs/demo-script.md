@@ -2,7 +2,10 @@
 
 **Live app:** https://bumahakaya.pages.dev
 **Tagline:** Alamin bago lumusong.
-**Tip:** Open the app on your phone or a projected browser before you start. Clear nothing; the seed data should be showing. Rehearse once so the clicks match the words.
+**Before you start:**
+- Open the app on your phone or a projected browser. Use a **private/incognito window** so posts and votes from your rehearsal don't show up (the app saves them in the browser).
+- On a projector, set **Profile → Appearance → Light**. On a phone, Dark looks great too.
+- Rehearse once so the taps match the words. Steps marked *(optional)* can be skipped if you're running long.
 
 Timings are a guide. Aim for a calm pace, around 150 words a minute.
 
@@ -32,38 +35,52 @@ Timings are a guide. Aim for a calm pace, around 150 words a minute.
 
 ## 1:05 to 3:20 — Live walkthrough
 
-**Start screen** *(tap Magsimula)*
-> "This is the app. One tap to get in, no sign-up needed."
+**Start screen** *(tap Continue as guest)*
+> "This is the app. One tap to get in, no account needed."
 
-**Home feed**
-> "This is Near You. Every card is one street. Taft at Estrada right now is marked Not passable, knee-deep, and rising. You can see who reported it, how long ago, and a photo."
+**Home: the status card**
+> "Home answers the question first. Four roads near me are not passable right now: two reported by people on the ground, two by our water-level sensors. And it tells me the one to avoid: Dagonoy side, waist-deep."
 
-*(Point at the Community / Social / All filter.)*
-> "Reports come from three places. Community, from people on the ground. Social, the same flood posts from Facebook and X we would normally hunt for ourselves."
+*(Tap **See all ›** on the "Iwasan muna" card.)*
+> "One tap shows just those reports."
 
-*(Tap Social, then tap All.)*
-> "And All puts them together."
+*(Tap the **×** on the "Not passable" chip under the search bar to clear it.)*
 
-*(Tap Confirm on a card.)*
-> "If I am on that street and it is true, I tap Confirm. That is how the crowd verifies a report in seconds."
+**Home: a post**
+> "Every card is one street. This one has a photo: you see a peek, and when I tap it…"
 
-*(Tap Comments on the Estrada card, read one, type a short one, tap Post.)*
-> "And I can open the thread to ask a question, like whether jeeps are still passing, and reply right here."
+*(Tap the "Flooding Taft Ave cor. Estrada" card.)*
+> "…the full photo, how deep, how far from campus, and this animation shows what knee-deep, not passable actually means: the car stalls, hazard lights on, a no-entry sign. Waist-deep looks different again."
 
-**Maps** *(tap Maps in the bottom bar)*
-> "The map colors every street by status. Green is passable, amber is gutter-deep, red is not passable. The bigger dots are our flood sensors. Below, a quick list of what is flooding closest to me."
+*(Tap **Confirm**.)*
+> "If I'm on that street and it's true, I tap Confirm. One vote per person, and it's saved. That's how the crowd verifies a report in seconds."
 
-**Report** *(tap the amber plus button)*
-> "Say I spot flooding myself. I tap the plus. I type the street, pick the water level, and post."
+*(Tap **Show on map**.)*
 
-*(Fill it in quickly, tap Post report. You land back on Home.)*
-> "And it is immediately on the feed and the map for everyone else nearby."
+**Maps**
+> "Show on map takes me straight to that pin. The map colors every report by road condition: green passable, amber gutter-deep, red not passable. The wave pins are our sensors."
 
-**Alerts** *(tap Alerts)*
-> "Alerts is the official layer. Class suspensions, road closures, PAGASA advisories, each labeled by source so you know what is official and what is from the crowd."
+*(Tap a red chip, e.g. **Not passable**, then tap it again to clear.)*
+> "I can filter to just what's dangerous. And the card at the bottom gives the summary: how many reports, the closest, the deepest."
 
-**Profile** *(tap Profile)*
-> "And Profile keeps your reports, your saved streets, and your contribution count, so the people who help their neighbors most get recognized."
+*(optional) Tap **List** to show the nearby reports as a list, then **Map** to go back.*
+
+**Report** *(tap the orange **+** button)*
+> "Say I spot flooding myself. I type the street, then I pin it: use my location, or pick the spot on the map, so the report lands exactly where the water is."
+
+*(Type a street, tap **Pick on map**, tap the map, tap **Use this spot**, pick a water level, optionally add a photo, tap **Post report**. You land back on Home.)*
+> "And it's immediately on the feed and the map for everyone nearby."
+
+**Alerts** *(tap **Alerts**)*
+> "Alerts is the official layer. At the top, what's flooding near me right now. Below, advisories sorted by what students care about, class suspensions first, newest first, and each one marked Official or Sensor."
+
+*(Tap the **Classes** chip.)*
+> "Walang pasok? It's right here."
+
+**Profile** *(tap **Profile**)*
+> "Profile keeps your reports, your saved streets, and how many times neighbors confirmed your reports."
+
+*(optional) Tap **Appearance → Dark** to show dark mode, then back to Light.*
 
 ---
 
@@ -88,6 +105,7 @@ Timings are a guide. Aim for a calm pace, around 150 words a minute.
 ## Backup answers for Q&A
 
 - **"Is the data real?"** Right now it is seeded demo data, clearly labeled in the app. The pilot replaces it with live community reports and sensor readings.
+- **"Are those your photos?"** The sample photos are credited on each post (Manila DRRM Office, Rammuel Balbuena / ARCHX). Confirm the team has permission before presenting, or swap in your own.
 - **"Where is data stored?"** This MVP keeps your reports in your own browser; the production version uses a shared database so reports sync across users.
 - **"How do you stop fake reports?"** Confirms from multiple users, sensor cross-checking, and timestamps. We flag reports that no one else confirms.
 - **"What makes you different from Project NOAH?"** NOAH is broad, scientific, nationwide. We are street-level, current, and commuter-focused. Is my street passable right now.

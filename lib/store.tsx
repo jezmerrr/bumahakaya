@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -27,6 +26,8 @@ import { CURRENT_USER } from "./user";
 
 const REPORTS_KEY = "bk.reports.v1";
 const COMMENTS_KEY = "bk.comments.v1";
+// Ids of reports the current user confirmed (one vote per person per report).
+const CONFIRMS_KEY = "bk.confirms.v1";
 
 export type NewReport = Omit<Report, "id" | "timestamp" | "source">;
 export type ReportChanges = Partial<
@@ -45,6 +46,10 @@ interface StoreValue {
   updateReport: (id: string, changes: ReportChanges) => void;
   removeReport: (id: string) => void;
   removeComment: (id: string) => void;
+  isConfirmed: (reportId: string) => boolean;
+  // Seed confirmations plus the current user's own vote, if any.
+  confirmCount: (report: Report) => number;
+  toggleConfirm: (reportId: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -89,12 +94,38 @@ export function withSeedPhotos(stored: Report[]): Report[] {
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [reports, setReports] = useState<Report[]>(seedReports);
-  const [comments, setComments] = useState<Comment[]>(seedComments);
+  // Saved data is read on first render. That's safe here: the server-rendered
+  // page is the Start screen, which shows none of this data, so the client's
+  // saved posts can't cause a hydration mismatch.
+  const [reports, setReports] = useState<Report[]>(() =>
+    withSeedPhotos(loadJSON(REPORTS_KEY, seedReports)),
+  );
+  const [comments, setComments] = useState<Comment[]>(() =>
+    loadJSON(COMMENTS_KEY, seedComments),
+  );
+  const [confirmedIds, setConfirmedIds] = useState<string[]>(() =>
+    loadJSON<string>(CONFIRMS_KEY, []),
+  );
 
-  useEffect(() => {
-    setReports(withSeedPhotos(loadJSON(REPORTS_KEY, seedReports)));
-    setComments(loadJSON(COMMENTS_KEY, seedComments));
+  const isConfirmed = useCallback(
+    (reportId: string) => confirmedIds.includes(reportId),
+    [confirmedIds],
+  );
+
+  const confirmCount = useCallback(
+    (report: Report) =>
+      (report.confirms ?? 0) + (confirmedIds.includes(report.id) ? 1 : 0),
+    [confirmedIds],
+  );
+
+  const toggleConfirm = useCallback((reportId: string) => {
+    setConfirmedIds((prev) => {
+      const next = prev.includes(reportId)
+        ? prev.filter((id) => id !== reportId)
+        : [...prev, reportId];
+      save(CONFIRMS_KEY, next);
+      return next;
+    });
   }, []);
 
   const addReport = useCallback((input: NewReport) => {
@@ -167,6 +198,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     updateReport,
     removeReport,
     removeComment,
+    isConfirmed,
+    confirmCount,
+    toggleConfirm,
   };
 
   return (

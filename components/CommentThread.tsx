@@ -65,7 +65,8 @@ export function CommentThread({ reportId }: { reportId: string }) {
           onChange={(e) => setDraft(e.target.value)}
           aria-label="Add a comment"
           placeholder="Add a comment…"
-          className="min-w-0 flex-1 rounded-full border border-ink/15 bg-surface px-3 py-2 text-sm"
+          // 16px text stops iPhones from zooming in on focus.
+          className="min-w-0 flex-1 rounded-full border border-ink/15 bg-surface px-3 py-2 text-base"
         />
         <button
           type="submit"

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AppShell } from "./AppShell";
 import { StoreProvider } from "@/lib/store";
@@ -48,9 +48,28 @@ describe("AppShell", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows the supplementary-source disclaimer", async () => {
-    await enterApp();
-    expect(screen.getByText(/does not replace/i)).toHaveTextContent(/PAGASA/);
+  it("shows a one-line demo notice that expands to the full disclaimer", async () => {
+    const user = await enterApp();
+    expect(screen.getByText(/not an official advisory/i)).toHaveTextContent(/PAGASA/);
+    const more = screen.getByRole("button", { name: "More" });
+    expect(more).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByText(/does not replace/i)).not.toBeVisible();
+
+    await user.click(more);
+    expect(screen.getByRole("button", { name: "Less" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText(/does not replace/i)).toBeVisible();
+  });
+
+  it("shows a post on the map from its details page", async () => {
+    const user = await enterApp();
+    await user.click(screen.getByRole("button", { name: "Flooding Taft Ave cor. Estrada" }));
+    const details = screen.getByRole("dialog", { name: /report details/i });
+    await user.click(within(details).getByRole("button", { name: /show on map/i }));
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByRole("button", { name: "Maps" })).toHaveAttribute("aria-pressed", "true");
+    const preview = screen.getByRole("region", { name: /selected report/i });
+    expect(within(preview).getByText("Flooding Taft Ave cor. Estrada")).toBeInTheDocument();
   });
 
   it("opens the Maps tab from the map preview on Home", async () => {

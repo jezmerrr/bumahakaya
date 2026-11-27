@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import { severityColor, severityInk, severityShort } from "@/lib/severity";
 import { relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
+import { useAppNav } from "@/lib/nav";
 import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
@@ -20,13 +21,16 @@ export function ReportCard({
   report: Report;
   distanceM?: number;
 }) {
-  const { comments, removeReport } = useStore();
+  const { comments, removeReport, confirmCount, isConfirmed, toggleConfirm } =
+    useStore();
+  const { showOnMap } = useAppNav();
   const commentCount = comments.filter((c) => c.reportId === report.id).length;
   const isMine =
     report.source === "community" && report.author === CURRENT_USER.handle;
 
-  const [confirms, setConfirms] = useState(report.confirms ?? 0);
-  const [confirmed, setConfirmed] = useState(false);
+  // Saved, one vote per person (see lib/store.tsx).
+  const confirms = confirmCount(report);
+  const confirmed = isConfirmed(report.id);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -37,11 +41,6 @@ export function ReportCard({
   const body = report.description ?? report.note;
   const color = severityColor(report.severity);
   const ink = severityInk(report.severity);
-
-  function toggleConfirm() {
-    setConfirms((c) => c + (confirmed ? -1 : 1));
-    setConfirmed((v) => !v);
-  }
 
   function deleteReport() {
     setConfirmingDelete(false);
@@ -125,12 +124,14 @@ export function ReportCard({
       <div className="mx-3.5 mb-2.5 mt-2 flex items-center gap-1 border-t border-ink/5 pt-2">
         <button
           type="button"
-          onClick={toggleConfirm}
+          onClick={() => toggleConfirm(report.id)}
           aria-pressed={confirmed}
           aria-label={`Confirm (${confirms})`}
+          disabled={isMine}
+          title={isMine ? "You can't confirm your own report" : undefined}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
-            confirmed ? "bg-signal text-white" : "text-ink/70 hover:bg-ink/5"
-          }`}
+            confirmed ? "bg-signal text-white" : "text-ink/70 enabled:hover:bg-ink/5"
+          } disabled:cursor-not-allowed`}
         >
           <ThumbsUpIcon className="h-4 w-4" /> {confirms}
         </button>
@@ -168,13 +169,11 @@ export function ReportCard({
         <ReportDetail
           report={report}
           distanceM={distanceM}
-          confirms={confirms}
-          confirmed={confirmed}
-          onToggleConfirm={toggleConfirm}
           isMine={isMine}
           onEdit={() => setEditing(true)}
           onDelete={() => setConfirmingDelete(true)}
           onClose={() => setDetailOpen(false)}
+          onShowOnMap={showOnMap ? () => showOnMap(report.id) : undefined}
         />
       ) : null}
       {editing ? (

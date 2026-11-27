@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { filterReports, filterSocial } from "@/lib/feed";
 import { distanceMeters, type LatLng } from "@/lib/geo";
@@ -11,7 +11,7 @@ import {
   summarize,
 } from "@/lib/mapSummary";
 import { severityColor, severityFill, severityShort } from "@/lib/severity";
-import type { Severity } from "@/lib/types";
+import type { Severity, SocialPost } from "@/lib/types";
 import { HomeHero } from "./HomeHero";
 import { SearchIcon, SlidersIcon, XIcon } from "./icons";
 import { ReportCard } from "./ReportCard";
@@ -206,16 +206,23 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
           </div>
         ) : null}
 
-        {visibleReports.map((report) => (
-          <ReportCard
-            key={report.id}
-            report={report}
-            distanceM={distanceMeters(DLSU_CENTER, report)}
-          />
+        {visibleReports.map((report, i) => (
+          <Fragment key={report.id}>
+            <ReportCard
+              report={report}
+              distanceM={distanceMeters(DLSU_CENTER, report)}
+            />
+            {/* Social posts get their own sideways row, early in the feed */}
+            {i === Math.min(2, visibleReports.length - 1) &&
+            source === "All" ? (
+              <SocialRow posts={visibleSocial} />
+            ) : null}
+          </Fragment>
         ))}
-        {visibleSocial.map((post) => (
-          <SocialCard key={post.id} post={post} />
-        ))}
+        {/* Only social posts (or no reports matched): show them full width */}
+        {source === "Social" || visibleReports.length === 0
+          ? visibleSocial.map((post) => <SocialCard key={post.id} post={post} />)
+          : null}
 
         {total === 0 ? (
           <div className="rounded-3xl bg-surface p-6 text-center shadow-sm">
@@ -365,5 +372,27 @@ function ActiveChip({
       {label}
       <XIcon className="h-3.5 w-3.5 text-ink/60" />
     </button>
+  );
+}
+
+// Sideways-scrolling row of social posts, with a heading and a count.
+function SocialRow({ posts }: { posts: SocialPost[] }) {
+  if (posts.length === 0) return null;
+  return (
+    <section aria-label="From social media" className="-mx-4 py-1">
+      <div className="flex items-baseline justify-between px-5 pb-2">
+        <h2 className="font-display text-base font-extrabold text-ink">
+          From social media
+        </h2>
+        <span className="text-xs text-ink/65">
+          {posts.length} {posts.length === 1 ? "post" : "posts"} · swipe
+        </span>
+      </div>
+      <div className="flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {posts.map((post) => (
+          <SocialCard key={post.id} post={post} compact />
+        ))}
+      </div>
+    </section>
   );
 }
