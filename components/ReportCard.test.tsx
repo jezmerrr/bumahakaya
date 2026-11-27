@@ -190,3 +190,33 @@ describe("ReportCard photos", () => {
     expect(screen.queryByText("Photo · tap to view")).toBeNull();
   });
 });
+
+describe("ReportCard confirmations", () => {
+  it("doesn't let you confirm your own report", () => {
+    render(
+      <StoreProvider>
+        <LiveCard id="r-002" />
+      </StoreProvider>,
+    );
+    expect(screen.getByRole("button", { name: "Confirm (23)" })).toBeDisabled();
+  });
+
+  it("remembers your confirmation after a reload", async () => {
+    const user = userEvent.setup();
+    const first = render(
+      <StoreProvider>
+        <ReportCard report={r1} />
+      </StoreProvider>,
+    );
+    await user.click(screen.getByRole("button", { name: "Confirm (12)" }));
+    expect(screen.getByRole("button", { name: "Confirm (13)" })).toHaveAttribute("aria-pressed", "true");
+    first.unmount();
+
+    render(
+      <StoreProvider>
+        <ReportCard report={r1} />
+      </StoreProvider>,
+    );
+    expect(screen.getByRole("button", { name: "Confirm (13)" })).toHaveAttribute("aria-pressed", "true");
+  });
+});

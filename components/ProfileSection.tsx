@@ -20,7 +20,7 @@ export function ProfileSection({
   onLogout?: () => void;
   onBusinessDashboard?: () => void;
 }) {
-  const { reports } = useStore();
+  const { reports, confirmCount } = useStore();
   const myReports = reports.filter((r) => r.author === CURRENT_USER.handle);
 
   const [view, setView] = useState<View>("menu");
@@ -109,10 +109,12 @@ export function ProfileSection({
     );
   }
 
+  // How many times other people confirmed this user's reports.
+  const confirmations = myReports.reduce((n, r) => n + confirmCount(r), 0);
   const stats = [
     { value: myReports.length, label: "Reports" },
-    { value: 9, label: "Verified" },
-    { value: saved.length, label: "Saved" },
+    { value: confirmations, label: "Confirmations" },
+    { value: saved.length, label: "Saved areas" },
   ];
 
   return (
@@ -131,7 +133,9 @@ export function ProfileSection({
           {CURRENT_USER.name}
         </h2>
 
-        <p className="text-sm text-ink/65">{CURRENT_USER.role}</p>
+        <p className="text-sm text-ink/65">
+          @{CURRENT_USER.handle} · {CURRENT_USER.role}
+        </p>
       </div>
 
       <div className="mt-5 flex rounded-3xl bg-surface p-4 shadow-sm">

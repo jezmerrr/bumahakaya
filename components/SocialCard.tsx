@@ -8,12 +8,22 @@ const PLATFORM: Record<Platform, { label: string; className: string }> = {
   reddit: { label: "Reddit", className: "bg-[#FF4500] text-white" },
 };
 
-export function SocialCard({ post }: { post: SocialPost }) {
+// `compact` is the fixed-width card used in the sideways "From social media"
+// row on Home; the full-width card is used when showing only social posts.
+export function SocialCard({
+  post,
+  compact = false,
+}: {
+  post: SocialPost;
+  compact?: boolean;
+}) {
   const p = PLATFORM[post.platform];
   return (
     <article
       data-testid="social-card"
-      className="rounded-3xl bg-surface p-4 shadow-sm"
+      className={`flex flex-col rounded-3xl bg-surface p-4 shadow-sm ${
+        compact ? "h-full w-64 shrink-0 snap-start" : ""
+      }`}
     >
       <div className="flex flex-wrap items-center gap-1.5">
         <span
@@ -24,7 +34,11 @@ export function SocialCard({ post }: { post: SocialPost }) {
         <span className="text-xs font-semibold text-ink">{post.author}</span>
         <DemoDataBadge />
       </div>
-      <p className="mt-2 text-sm text-ink/70">{post.text}</p>
+      <p
+        className={`mt-2 text-sm text-ink/70 ${compact ? "line-clamp-3 flex-1" : ""}`}
+      >
+        {post.text}
+      </p>
       <div className="mt-2 flex items-center justify-between">
         <a
           href={post.link}

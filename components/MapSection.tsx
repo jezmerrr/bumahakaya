@@ -63,11 +63,16 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-export function MapSection() {
+export function MapSection({
+  focusId = null,
+}: {
+  // Open with this report/sensor selected and zoomed in ("Show on map").
+  focusId?: string | null;
+}) {
   const { reports, sensors } = useStore();
   const [view, setView] = useState<"map" | "list">("map");
   const [severity, setSeverity] = useState<Severity | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(focusId);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [map, setMap] = useState<LeafletMap | null>(null);
 
@@ -125,7 +130,10 @@ export function MapSection() {
         // `isolate` keeps Leaflet's own z-indexes under the floating panels.
         <div className="absolute inset-0 isolate">
           <MapView
-            center={DLSU_CENTER}
+            // Only read when the map appears: open on the selected report
+            // (from "Show on map" or the list), otherwise on DLSU.
+            center={selected ? { lat: selected.lat, lng: selected.lng } : DLSU_CENTER}
+            zoom={selected ? 17 : 16}
             markers={shown}
             selectedId={selected?.id ?? null}
             onSelect={select}
@@ -265,6 +273,11 @@ export function MapSection() {
           report={detail}
           distanceM={distanceTo(detail.id)}
           onClose={() => setDetailId(null)}
+          onShowOnMap={() => {
+            setDetailId(null);
+            setView("map");
+            select(detail.id);
+          }}
         />
       ) : null}
     </div>

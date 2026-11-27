@@ -8,8 +8,11 @@ import {
   severityInk,
   waterLevelLabel,
 } from "@/lib/severity";
+import type { LatLng } from "@/lib/geo";
 import { compressPhoto } from "@/lib/photo";
 import type { Severity, WaterLevel } from "@/lib/types";
+import { MapIcon, MapPinIcon } from "./icons";
+import { describePin, LocationPickerSheet } from "./LocationPicker";
 
 export interface ReportFormValues {
   location: string;
@@ -17,6 +20,9 @@ export interface ReportFormValues {
   severity: Severity;
   description: string;
   photoUrl?: string;
+  // Where the flood is on the map. Required: without it the report would
+  // land in the wrong place.
+  pin: LatLng | null;
 }
 
 const WATER_LEVELS: WaterLevel[] = ["Ankle", "Knee", "Waist+"];
@@ -46,6 +52,7 @@ export const EMPTY_REPORT: ReportFormValues = {
   waterLevel: "Ankle",
   severity: suggestRoadCondition("Ankle"),
   description: "",
+  pin: null,
 };
 
 // Headline given to reports posted from the form. Kept here so editing can
@@ -84,6 +91,34 @@ export function ReportForm({
   const [photoUrl, setPhotoUrl] = useState<string | undefined>(
     initial.photoUrl,
   );
+  const [pin, setPin] = useState<LatLng | null>(initial.pin);
+  const [picking, setPicking] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [pinError, setPinError] = useState<string | null>(null);
+
+  function locateMe() {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setPinError("This browser can't share its location. Pick the spot on the map instead.");
+      return;
+    }
+    setLocating(true);
+    setPinError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        setPin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      },
+      (err) => {
+        setLocating(false);
+        setPinError(
+          err.code === err.PERMISSION_DENIED
+            ? "Location is turned off for this site. Pick the spot on the map instead."
+            : "Couldn't find your location. Pick the spot on the map instead.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
+    );
+  }
 
   function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -98,12 +133,17 @@ export function ReportForm({
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!location.trim()) return;
+    if (!pin) {
+      setPinError("Add a pin first: use your location or pick the spot on the map.");
+      return;
+    }
     onSubmit({
       location: location.trim(),
       waterLevel,
       severity,
       description: description.trim(),
       photoUrl,
+      pin,
     });
   }
 
@@ -124,8 +164,55 @@ export function ReportForm({
         onChange={(e) => setLocation(e.target.value)}
         placeholder="e.g. Taft Ave cor. Estrada"
         required
-        className="mt-2 w-full rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-sm"
+        // 16px text stops iPhones from zooming in on focus.
+        className="mt-2 w-full rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-base"
       />
+
+      {/* Map pin: where the report shows up on the map */}
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={locateMe}
+          disabled={locating}
+          className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-ink/15 bg-surface py-2.5 text-sm font-semibold text-ink disabled:opacity-60"
+        >
+          <MapPinIcon className="h-4 w-4" />
+          {locating ? "Locating…" : "Use my location"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setPinError(null);
+            setPicking(true);
+          }}
+          className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-ink/15 bg-surface py-2.5 text-sm font-semibold text-ink"
+        >
+          <MapIcon className="h-4 w-4" />
+          {pin ? "Change on map" : "Pick on map"}
+        </button>
+      </div>
+      <p
+        role="status"
+        className={`mt-1.5 text-xs ${
+          pinError ? "font-semibold text-[color:var(--sev-ink-impass)]" : "text-ink/65"
+        }`}
+      >
+        {pinError ??
+          (pin
+            ? `📍 Pinned · ${describePin(pin)}`
+            : "Add a pin so the report shows up in the right spot on the map.")}
+      </p>
+      {picking ? (
+        <LocationPickerSheet
+          initial={pin}
+          onPick={(p) => {
+            setPin(p);
+            setPinError(null);
+            setPicking(false);
+          }}
+          onClose={() => setPicking(false)}
+        />
+      ) : null}
 
       {/* Water level */}
       <p className={sectionLabel}>Water level</p>
@@ -232,7 +319,7 @@ export function ReportForm({
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Describe the flooding or share other important details..."
         rows={4}
-        className="mt-2 w-full resize-none rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-sm"
+        className="mt-2 w-full resize-none rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-base"
       />
 
       {/* Submit */}

@@ -10,7 +10,7 @@ import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
 import { DemoDataBadge } from "./DemoDataBadge";
 import { FloodScene } from "./FloodScene";
-import { ThumbsUpIcon } from "./icons";
+import { MapPinIcon, ThumbsUpIcon } from "./icons";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
 import { ConfirmDeleteDialog, Sheet } from "./Sheet";
 import {
@@ -26,25 +26,24 @@ import {
 export function ReportDetail({
   report,
   distanceM,
-  confirms,
-  confirmed,
-  onToggleConfirm,
   isMine,
   onEdit,
   onDelete,
   onClose,
+  onShowOnMap,
 }: {
   report: Report;
   distanceM?: number;
-  confirms: number;
-  confirmed: boolean;
-  onToggleConfirm: () => void;
   isMine: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onClose: () => void;
+  // Open the Maps tab with this report selected.
+  onShowOnMap?: () => void;
 }) {
-  const { comments } = useStore();
+  const { comments, confirmCount, isConfirmed, toggleConfirm } = useStore();
+  const confirms = confirmCount(report);
+  const confirmed = isConfirmed(report.id);
   const commentCount = comments.filter((c) => c.reportId === report.id).length;
   const title = report.headline ?? report.streetName;
   const body = report.description ?? report.note;
@@ -115,9 +114,21 @@ export function ReportDetail({
         </section>
 
         <section className="rounded-3xl bg-surface p-4 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink/65">
-            Flood details
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-ink/65">
+              Flood details
+            </h3>
+            {onShowOnMap ? (
+              <button
+                type="button"
+                onClick={onShowOnMap}
+                className="inline-flex items-center gap-1 rounded-full bg-ink/5 px-3 py-1.5 text-xs font-semibold text-ink hover:bg-ink/10"
+              >
+                <MapPinIcon className="h-3.5 w-3.5" />
+                Show on map
+              </button>
+            ) : null}
+          </div>
           <dl className="mt-1 divide-y divide-ink/10 text-sm">
             <Fact label="Location" value={report.streetName} />
             <Fact
@@ -145,14 +156,21 @@ export function ReportDetail({
 
         <button
           type="button"
-          onClick={onToggleConfirm}
+          onClick={() => toggleConfirm(report.id)}
           aria-pressed={confirmed}
-          className={`flex w-full items-center justify-center gap-1.5 rounded-2xl py-3 text-sm font-semibold ${
+          // One vote per person, and not on your own report.
+          disabled={isMine}
+          className={`flex w-full items-center justify-center gap-1.5 rounded-2xl py-3 text-sm font-semibold disabled:cursor-not-allowed ${
             confirmed ? "bg-signal text-white" : "bg-surface text-ink/70 shadow-sm"
           }`}
         >
           <ThumbsUpIcon className="h-4 w-4" /> Confirm ({confirms})
         </button>
+        {isMine ? (
+          <p className="-mt-1 text-center text-xs text-ink/60">
+            Others confirm your report when they see the same flooding.
+          </p>
+        ) : null}
 
         <section className="rounded-3xl bg-surface p-4 shadow-sm">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink/65">
@@ -171,16 +189,16 @@ export function ReportDetailPage({
   report,
   distanceM,
   onClose,
+  onShowOnMap,
 }: {
   report: Report;
   distanceM?: number;
   onClose: () => void;
+  onShowOnMap?: () => void;
 }) {
   const { removeReport } = useStore();
   const isMine =
     report.source === "community" && report.author === CURRENT_USER.handle;
-  const [confirms, setConfirms] = useState(report.confirms ?? 0);
-  const [confirmed, setConfirmed] = useState(false);
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
@@ -189,13 +207,8 @@ export function ReportDetailPage({
       <ReportDetail
         report={report}
         distanceM={distanceM}
-        confirms={confirms}
-        confirmed={confirmed}
-        onToggleConfirm={() => {
-          setConfirms((c) => c + (confirmed ? -1 : 1));
-          setConfirmed((v) => !v);
-        }}
         isMine={isMine}
+        onShowOnMap={onShowOnMap}
         onEdit={() => setEditing(true)}
         onDelete={() => setConfirmingDelete(true)}
         onClose={onClose}
@@ -245,6 +258,7 @@ export function EditReportSheet({
     severity: report.severity,
     description: report.description ?? report.note ?? "",
     photoUrl: report.photoUrl,
+    pin: { lat: report.lat, lng: report.lng },
   };
 
   function save(values: ReportFormValues) {
@@ -258,6 +272,7 @@ export function EditReportSheet({
       passable: values.severity !== "Impassable",
       description: values.description,
       photoUrl: values.photoUrl,
+      ...(values.pin ? { lat: values.pin.lat, lng: values.pin.lng } : {}),
     });
     onClose();
   }
