@@ -28,6 +28,8 @@ export interface Report {
   trend?: Trend;
   confirms?: number;
   comments?: number;
+  // Set when the author edits the report after posting.
+  editedAt?: string;
 }
 
 // A single historical water-level reading from one IoT sensor.

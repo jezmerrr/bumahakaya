@@ -13,3 +13,16 @@ export function relativeTime(iso: string, now: Date = new Date()): string {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 }
+
+const DATE_TIME = new Intl.DateTimeFormat("en-PH", {
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: "Asia/Manila",
+});
+
+// Full posting time for detail views, e.g. "Nov 28, 12:30 AM" (Manila time).
+export function formatDateTime(iso: string): string {
+  return DATE_TIME.format(new Date(iso));
+}

@@ -28,6 +28,26 @@ function RemoveProbe() {
   );
 }
 
+function UpdateProbe() {
+  const { reports, updateReport } = useStore();
+  const r2 = reports.find((r) => r.id === "r-002");
+  return (
+    <div>
+      <span data-testid="desc">{r2?.description ?? ""}</span>
+      <span data-testid="edited">{r2?.editedAt ?? ""}</span>
+      <span data-testid="author">{r2?.author ?? ""}</span>
+      <span data-testid="time">{r2?.timestamp ?? ""}</span>
+      <button
+        onClick={() =>
+          updateReport("r-002", { description: "updated", severity: "Impassable" })
+        }
+      >
+        update
+      </button>
+    </div>
+  );
+}
+
 function Probe() {
   const { reports, addReport } = useStore();
   return (
@@ -123,6 +143,29 @@ describe("store", () => {
       commentsBefore - 1,
     );
     expect(localStorage.getItem("bk.comments.v1")).not.toContain("c-001");
+  });
+
+  it("updateReport changes fields, marks it edited, and persists", async () => {
+    render(
+      <StoreProvider>
+        <UpdateProbe />
+      </StoreProvider>,
+    );
+    const postedAt = screen.getByTestId("time").textContent;
+    expect(screen.getByTestId("edited").textContent).toBe("");
+
+    await userEvent.click(screen.getByText("update"));
+    expect(screen.getByTestId("desc").textContent).toBe("updated");
+    expect(screen.getByTestId("edited").textContent).not.toBe("");
+    // Author and original post time never change on edit.
+    expect(screen.getByTestId("author").textContent).toBe("jramos");
+    expect(screen.getByTestId("time").textContent).toBe(postedAt);
+
+    const saved = JSON.parse(localStorage.getItem("bk.reports.v1") ?? "[]");
+    const r2 = saved.find((r: { id: string }) => r.id === "r-002");
+    expect(r2.description).toBe("updated");
+    expect(r2.severity).toBe("Impassable");
+    expect(r2.editedAt).toBeTruthy();
   });
 
   it("falls back to seed when localStorage is corrupted", () => {
