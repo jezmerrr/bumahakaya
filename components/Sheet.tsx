@@ -88,19 +88,19 @@ export function Sheet({
         aria-labelledby={titleId}
         className="flex h-full w-full max-w-md flex-col overflow-y-auto bg-mist motion-safe:animate-sheet-in"
       >
-        <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-navy/10 bg-mist/95 px-4 py-3 backdrop-blur">
+        <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-ink/10 bg-mist/95 px-4 py-3 backdrop-blur">
           <button
             ref={initialFocus}
             type="button"
             onClick={onClose}
             aria-label="Back"
-            className="shrink-0 rounded-full border border-navy/15 px-3 py-1 text-sm font-semibold text-navy/70"
+            className="shrink-0 rounded-full border border-ink/15 px-3 py-1 text-sm font-semibold text-ink/70"
           >
             ‹ Back
           </button>
           <h2
             id={titleId}
-            className="min-w-0 flex-1 truncate font-display text-lg font-extrabold text-navy"
+            className="min-w-0 flex-1 truncate font-display text-lg font-extrabold text-ink"
           >
             {title}
           </h2>
@@ -141,18 +141,18 @@ export function ConfirmDeleteDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={messageId}
-        className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-xl motion-safe:animate-sheet-in"
+        className="w-full max-w-sm rounded-3xl bg-surface p-5 shadow-xl motion-safe:animate-sheet-in"
       >
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-impass/10 text-impass">
           <TrashIcon className="h-6 w-6" />
         </div>
         <h2
           id={titleId}
-          className="mt-3 text-center font-display text-lg font-extrabold text-navy"
+          className="mt-3 text-center font-display text-lg font-extrabold text-ink"
         >
           {title}
         </h2>
-        <p id={messageId} className="mt-1 text-center text-sm text-navy/70">
+        <p id={messageId} className="mt-1 text-center text-sm text-ink/70">
           {message}
         </p>
         <div className="mt-5 grid grid-cols-2 gap-2">
@@ -160,7 +160,7 @@ export function ConfirmDeleteDialog({
             ref={initialFocus}
             type="button"
             onClick={onCancel}
-            className="rounded-2xl bg-navy/5 py-3 text-sm font-semibold text-navy/70"
+            className="rounded-2xl bg-ink/5 py-3 text-sm font-semibold text-ink/70"
           >
             Cancel
           </button>
@@ -202,11 +202,11 @@ export function BottomSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-md rounded-t-3xl bg-white px-5 pb-8 pt-3 shadow-xl motion-safe:animate-sheet-in"
+        className="w-full max-w-md rounded-t-3xl bg-surface px-5 pb-8 pt-3 shadow-xl motion-safe:animate-sheet-in"
       >
-        <div aria-hidden="true" className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-navy/15" />
+        <div aria-hidden="true" className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-ink/15" />
         <div className="flex items-center justify-between">
-          <h2 id={titleId} className="font-display text-lg font-extrabold text-navy">
+          <h2 id={titleId} className="font-display text-lg font-extrabold text-ink">
             {title}
           </h2>
           <button
@@ -214,7 +214,7 @@ export function BottomSheet({
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-full bg-navy/5 text-navy/70"
+            className="grid h-9 w-9 place-items-center rounded-full bg-ink/5 text-ink/70"
           >
             <XIcon className="h-4 w-4" />
           </button>

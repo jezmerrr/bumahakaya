@@ -109,7 +109,7 @@ function Field({
         id={id}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-white/15 bg-white/95 px-3 py-2 text-sm text-navy"
+        className="w-full rounded-xl border border-white/15 bg-surface/95 px-3 py-2 text-sm text-ink"
       />
     </label>
   );

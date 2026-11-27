@@ -67,15 +67,15 @@ export function ReportDetail({
           />
         ) : null}
 
-        <section className="rounded-3xl bg-white p-4 shadow-sm">
+        <section className="rounded-3xl bg-surface p-4 shadow-sm">
           <div className="flex items-center gap-3">
             <Avatar name={report.author ?? report.streetName} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-navy">
+              <p className="truncate text-sm font-semibold text-ink">
                 {report.author ??
                   (report.source === "sensor" ? "FloodWatch sensor" : "Anonymous")}
               </p>
-              <p className="text-xs text-navy/65">
+              <p className="text-xs text-ink/65">
                 <time dateTime={report.timestamp}>
                   {formatDateTime(report.timestamp)}
                 </time>{" "}
@@ -85,28 +85,28 @@ export function ReportDetail({
             </div>
           </div>
 
-          <h3 className="mt-3 font-display text-xl font-extrabold leading-snug text-navy">
+          <h3 className="mt-3 font-display text-xl font-extrabold leading-snug text-ink">
             {title}
           </h3>
           <div className="mt-2">
             <StatusPill severity={report.severity} />
           </div>
           {body ? (
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-navy/70">
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink/70">
               {body}
             </p>
           ) : (
-            <p className="mt-3 text-sm italic text-navy/60">
+            <p className="mt-3 text-sm italic text-ink/60">
               No description added.
             </p>
           )}
         </section>
 
-        <section className="rounded-3xl bg-white p-4 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-navy/65">
+        <section className="rounded-3xl bg-surface p-4 shadow-sm">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink/65">
             Flood details
           </h3>
-          <dl className="mt-1 divide-y divide-navy/10 text-sm">
+          <dl className="mt-1 divide-y divide-ink/10 text-sm">
             <Fact label="Location" value={report.streetName} />
             <Fact
               label="Water level"
@@ -136,14 +136,14 @@ export function ReportDetail({
           onClick={onToggleConfirm}
           aria-pressed={confirmed}
           className={`flex w-full items-center justify-center gap-1.5 rounded-2xl py-3 text-sm font-semibold ${
-            confirmed ? "bg-signal text-white" : "bg-white text-navy/70 shadow-sm"
+            confirmed ? "bg-signal text-white" : "bg-surface text-ink/70 shadow-sm"
           }`}
         >
           <ThumbsUpIcon className="h-4 w-4" /> Confirm ({confirms})
         </button>
 
-        <section className="rounded-3xl bg-white p-4 shadow-sm">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-navy/65">
+        <section className="rounded-3xl bg-surface p-4 shadow-sm">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink/65">
             Comments ({commentCount})
           </h3>
           <CommentThread reportId={report.id} />
@@ -210,8 +210,8 @@ export function ReportDetailPage({
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-navy/65">{label}</dt>
-      <dd className="text-right font-semibold text-navy">{value}</dd>
+      <dt className="shrink-0 text-ink/65">{label}</dt>
+      <dd className="text-right font-semibold text-ink">{value}</dd>
     </div>
   );
 }

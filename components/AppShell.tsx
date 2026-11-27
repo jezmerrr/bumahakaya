@@ -9,6 +9,7 @@ import { ReportSection } from "./ReportSection";
 import { AlertsSection } from "./AlertsSection";
 import { ProfileSection } from "./ProfileSection";
 import { BusinessDashboard } from "./BusinessDashboard";
+import { ThemeToggle } from "./ThemeControls";
 import {
   BellIcon,
   HomeIcon,
@@ -62,11 +63,12 @@ export function AppShell() {
         fullScreen ? "h-dvh overflow-hidden" : "min-h-full"
       }`}
     >
-      <header className="bg-navy px-4 py-3">
+      <header className="flex items-center justify-between bg-navy px-4 py-2">
         <Logo variant="dark" />
+        <ThemeToggle />
       </header>
 
-      <p className="border-b border-amber/30 bg-[#fbe3b9] px-4 py-1.5 text-[11px] leading-snug text-navy/70">
+      <p className="border-b border-amber/30 bg-notice px-4 py-1.5 text-[11px] leading-snug text-ink/70">
         Heads up, this is a demo. Always follow official PAGASA and LGU
         advisories. BumahaKaya? helps you check your street, it does not replace
         them.
@@ -76,7 +78,7 @@ export function AppShell() {
         {sections[tab]}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-[1000] mx-auto flex w-full max-w-md items-center justify-between border-t border-navy/10 bg-white px-5 py-2">
+      <nav className="fixed inset-x-0 bottom-0 z-[1000] mx-auto flex w-full max-w-md items-center justify-between border-t border-ink/10 bg-surface px-5 py-2">
         {NAV.slice(0, 2).map(({ key, Icon }) => (
           <NavButton
             key={key}
@@ -127,7 +129,7 @@ function NavButton({
       onClick={onClick}
       aria-pressed={active}
       className={`flex flex-col items-center gap-0.5 text-[11px] font-semibold ${
-        active ? "text-signal" : "text-navy/65"
+        active ? "text-signal" : "text-ink/65"
       }`}
     >
       <Icon className="h-5 w-5" />

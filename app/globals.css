@@ -21,6 +21,13 @@
   /* Darker amber for amber text (brand amber is too light to read as text) */
   --color-amber-ink: #a35f0c;
 
+  /* Theme colors: cards, main text, glass edges, the demo notice.
+     Light values here; dark values in the dark-mode block below. */
+  --color-surface: #ffffff;
+  --color-ink: #0b2545;
+  --color-edge: rgb(255 255 255 / 0.7);
+  --color-notice: #fbe3b9;
+
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
 
@@ -44,9 +51,65 @@ body {
   height: 100%;
 }
 
+/* Light theme extras: road-condition text colors and the status card's sky
+   (used from inline styles, so plain variables rather than @theme). */
+:root {
+  color-scheme: light;
+  --sev-ink-pass: #136f4c;
+  --sev-ink-caution: #a35f0c;
+  --sev-ink-impass: #b42f2f;
+  --sky-pass: #8fd3f2;
+  --sky-pass-mid: #d9f0fb;
+  --sky-caution: #f6cf8f;
+  --sky-caution-mid: #fcebd0;
+  --sky-impass: #f2a7a7;
+  --sky-impass-mid: #fbe0e0;
+}
+
+/* Dark theme. lib/themeScript.ts sets data-theme on <html> before the first
+   paint from the saved choice or the device setting. Brand navy (header,
+   start screen), signal blue buttons, amber, and the road-condition fills
+   stay the same; page, cards, and text flip. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-mist: #0c1626;
+  --color-surface: #15233a;
+  --color-ink: #e6edf7;
+  --color-edge: rgb(255 255 255 / 0.08);
+  --color-notice: #3a2a10;
+  --color-amber-ink: #f2b45c;
+  --sev-ink-pass: #5fd3a2;
+  --sev-ink-caution: #f2b45c;
+  --sev-ink-impass: #ff8f8f;
+  --sky-pass: #123a55;
+  --sky-pass-mid: #142c44;
+  --sky-caution: #4a3515;
+  --sky-caution-mid: #2c2418;
+  --sky-impass: #4a1f28;
+  --sky-impass-mid: #2a1b26;
+  /* Alert badge tints (Alerts tab) */
+  --color-blue-50: #16294a;
+  --color-blue-700: #9cc3ff;
+  --color-teal-50: #0f2f33;
+  --color-teal-700: #7fdad0;
+  --color-violet-50: #251d44;
+  --color-violet-700: #c4b5fd;
+}
+/* Blue links need a lighter shade on dark cards; blue buttons with white
+   text keep the brand blue. */
+:root[data-theme="dark"] .text-signal {
+  color: #7fb2ff;
+}
+/* Dim the daylight flood illustration a little at night. */
+:root[data-theme="dark"] .flood-scene-art {
+  filter: brightness(0.82) saturate(0.9);
+}
+
 body {
   background: var(--color-mist);
-  color: var(--color-navy);
+  /* Theme text color, so anything without its own color (input text,
+     placeholders) stays readable in dark mode too */
+  color: var(--color-ink);
   font-family: var(--font-sans);
 }
 
@@ -228,7 +291,7 @@ body {
 /* Modern map (components/MapView.tsx): softened OpenStreetMap tiles, round pins,
    a pulsing "you are here" dot, and a pill label on the selected pin. */
 .map-modern.leaflet-container {
-  background: #fff;
+  background: var(--color-surface);
   font-family: inherit;
 }
 /* Softer basemap: keep OSM's colors and contrast, just slightly lighter so
@@ -246,6 +309,20 @@ body {
   font-size: 10px;
   color: rgb(11 37 69 / 0.7);
   backdrop-filter: blur(6px);
+}
+/* Dark map: invert the OSM tiles and turn the colors back, giving dark
+   streets on a navy base. */
+:root[data-theme="dark"] .map-modern .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) saturate(0.6) brightness(0.9)
+    contrast(0.9);
+  opacity: 0.85;
+}
+:root[data-theme="dark"] .map-modern .leaflet-control-attribution {
+  background: rgb(21 35 58 / 0.8);
+  color: rgb(230 237 247 / 0.7);
+}
+:root[data-theme="dark"] .map-modern .leaflet-control-attribution a {
+  color: #7fb2ff;
 }
 .map-pin-wrap {
   border: 0;

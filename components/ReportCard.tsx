@@ -52,7 +52,7 @@ export function ReportCard({
   return (
     <article
       data-testid="report-card"
-      className="rounded-3xl bg-white p-3.5 shadow-sm"
+      className="rounded-3xl bg-surface p-3.5 shadow-sm"
     >
       {/* Tapping anywhere in this block opens the details page. The title
           button's ::after stretches over the whole block, so there is one
@@ -67,19 +67,19 @@ export function ReportCard({
         </span>
 
         <div className="min-w-0 flex-1">
-          <h3 className="line-clamp-1 font-display text-[15px] font-extrabold leading-snug text-navy">
+          <h3 className="line-clamp-1 font-display text-[15px] font-extrabold leading-snug text-ink">
             <button
               type="button"
               onClick={() => setDetailOpen(true)}
-              className="text-left after:absolute after:-inset-1.5 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-signal active:after:bg-navy/5"
+              className="text-left after:absolute after:-inset-1.5 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-signal active:after:bg-ink/5"
             >
               {title}
             </button>
           </h3>
           {body ? (
-            <p className="line-clamp-1 text-sm text-navy/70">{body}</p>
+            <p className="line-clamp-1 text-sm text-ink/70">{body}</p>
           ) : null}
-          <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-navy/70">
+          <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-ink/70">
             <span
               className="inline-flex shrink-0 items-center gap-1 font-semibold"
               style={{ color: ink }}
@@ -121,14 +121,14 @@ export function ReportCard({
         </div>
       ) : null}
 
-      <div className="mt-2 flex items-center gap-1 border-t border-navy/5 pt-2">
+      <div className="mt-2 flex items-center gap-1 border-t border-ink/5 pt-2">
         <button
           type="button"
           onClick={toggleConfirm}
           aria-pressed={confirmed}
           aria-label={`Confirm (${confirms})`}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
-            confirmed ? "bg-signal text-white" : "text-navy/70 hover:bg-navy/5"
+            confirmed ? "bg-signal text-white" : "text-ink/70 hover:bg-ink/5"
           }`}
         >
           <ThumbsUpIcon className="h-4 w-4" /> {confirms}
@@ -139,12 +139,12 @@ export function ReportCard({
           aria-expanded={commentsOpen}
           aria-label={`Comments (${commentCount})`}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
-            commentsOpen ? "bg-navy/5 text-navy" : "text-navy/70 hover:bg-navy/5"
+            commentsOpen ? "bg-ink/5 text-ink" : "text-ink/70 hover:bg-ink/5"
           }`}
         >
           <CommentIcon className="h-4 w-4" /> {commentCount}
         </button>
-        <span className="ml-auto truncate pl-2 text-xs text-navy/60">
+        <span className="ml-auto truncate pl-2 text-xs text-ink/60">
           {report.author ? `@${report.author}` : "Anonymous"}
         </span>
         {isMine ? (
@@ -157,7 +157,7 @@ export function ReportCard({
       </div>
 
       {commentsOpen ? (
-        <div className="mt-2 border-t border-navy/5 pt-3">
+        <div className="mt-2 border-t border-ink/5 pt-3">
           <CommentThread reportId={report.id} />
         </div>
       ) : null}

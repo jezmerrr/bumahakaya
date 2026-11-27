@@ -62,4 +62,15 @@ describe("AppShell", () => {
       "true",
     );
   });
+
+  it("switches between light and dark from the header", async () => {
+    localStorage.clear();
+    document.documentElement.setAttribute("data-theme", "light");
+    const user = await enterApp();
+    await user.click(screen.getByRole("button", { name: "Switch to dark mode" }));
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    await user.click(screen.getByRole("button", { name: "Switch to light mode" }));
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+    localStorage.clear();
+  });
 });

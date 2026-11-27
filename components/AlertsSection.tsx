@@ -54,10 +54,10 @@ export function AlertsSection() {
 
   return (
     <div className="px-4 pb-4 pt-4">
-      <h1 className="font-display text-2xl font-extrabold text-navy">
+      <h1 className="font-display text-2xl font-extrabold text-ink">
         Alerts
       </h1>
-      <p className="text-sm text-navy/65">Flood warnings near you</p>
+      <p className="text-sm text-ink/65">Flood warnings near you</p>
 
       <div className="mt-4 space-y-3">
         {announcements.map((a) => {
@@ -67,7 +67,7 @@ export function AlertsSection() {
           return (
             <article
               key={a.id}
-              className="flex gap-3 rounded-3xl bg-white p-4 shadow-sm"
+              className="flex gap-3 rounded-3xl bg-surface p-4 shadow-sm"
             >
               <span
                 className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${source.bg} ${source.color}`}
@@ -77,15 +77,15 @@ export function AlertsSection() {
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-display text-sm font-extrabold text-navy">
+                  <h3 className="font-display text-sm font-extrabold text-ink">
                     {a.title}
                   </h3>
-                  <span className="shrink-0 text-[11px] text-navy/60">
+                  <span className="shrink-0 text-[11px] text-ink/60">
                     {relativeTime(a.timestamp)}
                   </span>
                 </div>
 
-                <p className="mt-1 text-xs leading-relaxed text-navy/70">
+                <p className="mt-1 text-xs leading-relaxed text-ink/70">
                   {a.body}
                 </p>
 
@@ -96,7 +96,7 @@ export function AlertsSection() {
                     {source.label}
                   </span>
 
-                  <span className="text-[11px] font-semibold text-navy/65">
+                  <span className="text-[11px] font-semibold text-ink/65">
                     {a.agency}
                   </span>
 
