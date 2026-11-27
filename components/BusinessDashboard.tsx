@@ -1,17 +1,30 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useStore } from "@/lib/store";
 import { reportsNearby, type LatLng } from "@/lib/geo";
 import type { Report } from "@/lib/types";
+import {
+  averagedSeries,
+  floodHotspots,
+  readingsToCSV,
+  readingsWithin,
+  IMPASSABLE_CM,
+  RANGE_HOURS,
+  RANGE_LABEL,
+  type RangeKey,
+} from "@/lib/analytics";
 import {
   AlertTriangle,
   MapPin,
   Construction,
   Waves,
   CloudRain,
+  FileDown,
+  TrendingUp,
+  Lock,
 } from "lucide-react";
 
 const DLSU_CENTER: LatLng = {
@@ -33,7 +46,31 @@ export function BusinessDashboard({
 }: {
   onBack: () => void;
 }) {
-  const { reports, sensors } = useStore();
+  const { reports, sensors, sensorHistory } = useStore();
+
+  const [range, setRange] = useState<RangeKey>("7d");
+
+  // Historical analytics derived from the selected time range.
+  const { series, hotspots, windowReadings } = useMemo(() => {
+    const hours = RANGE_HOURS[range];
+    const now = Date.now();
+    return {
+      series: averagedSeries(sensorHistory, hours, 48, now),
+      hotspots: floodHotspots(sensorHistory, hours, now),
+      windowReadings: readingsWithin(sensorHistory, hours, now),
+    };
+  }, [sensorHistory, range]);
+
+  function downloadReport() {
+    const csv = readingsToCSV(windowReadings);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `floodwatch-report-${range}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   // Combine community reports and sensor readings for the map.
   const markers: Report[] = [...reports, ...sensors];
@@ -188,49 +225,238 @@ export function BusinessDashboard({
         </p>
       </section>
 
-      {/* Water-Level Trend */}
+      {/* Range selector */}
+      <div className="flex items-center gap-1.5">
+        {(Object.keys(RANGE_HOURS) as RangeKey[]).map((key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setRange(key)}
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              range === key
+                ? "bg-navy text-white"
+                : "bg-white text-navy/60 border border-navy/10"
+            }`}
+          >
+            {RANGE_LABEL[key]}
+          </button>
+        ))}
+      </div>
+
+      {/* Historical Water-Level Trend */}
       <section className="rounded-2xl border border-navy/10 bg-white p-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-navy">
-            Water-level trend
-          </h2>
-
-          <span className="rounded-full bg-amber/15 px-2 py-1 text-[10px] font-bold capitalize text-amber">
+          <h2 className="font-bold text-navy">Water-level trend</h2>
+          <span className="flex items-center gap-1 rounded-full bg-amber/15 px-2 py-1 text-[10px] font-bold capitalize text-amber">
+            <TrendingUp className="h-3 w-3" />
             {trendLabel}
           </span>
         </div>
 
-        <p className="mt-3 text-xs text-navy/50">
-          Latest sensor reading
+        <p className="mt-1 text-xs text-navy/50">
+          Average across all sensors · last {RANGE_LABEL[range]}
         </p>
 
-        <div className="mt-3 flex h-12 items-end gap-1">
-          {sensors.slice(0, 8).map((sensor) => (
-            <div
-              key={sensor.id}
-              className="flex-1 rounded-t-sm bg-[#8CCFC4]"
-              style={{
-                height: `${Math.max(
-                  12,
-                  Math.min(
-                    100,
-                    ((sensor.sensorCm ?? 0) / 71) * 100,
-                  ),
-                )}%`,
-              }}
-            />
-          ))}
-        </div>
+        <TrendChart points={series} threshold={IMPASSABLE_CM} />
 
-        <p className="mt-2 text-[10px] text-navy/50">
-          Sample readings only · Not historical data
+        <div className="mt-2 flex items-center gap-3 text-[10px] text-navy/50">
+          <span className="flex items-center gap-1">
+            <span className="h-0.5 w-3 bg-[#247A60]" /> Water level (cm)
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-0.5 w-3 border-t border-dashed border-impass" />
+            Not passable ≥ {IMPASSABLE_CM} cm
+          </span>
+        </div>
+      </section>
+
+      {/* Flood Hotspots */}
+      <section className="rounded-2xl border border-navy/10 bg-white p-4">
+        <h2 className="font-bold text-navy">Flood hotspots</h2>
+        <p className="mt-1 text-xs text-navy/50">
+          Streets ranked by flood events · last {RANGE_LABEL[range]}
+        </p>
+
+        <ol className="mt-3 space-y-2">
+          {hotspots.length === 0 && (
+            <li className="text-xs text-navy/40">
+              No streets crossed the not-passable level in this period.
+            </li>
+          )}
+          {hotspots.map((h, i) => (
+            <li key={h.streetName} className="flex items-center gap-3">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-navy/5 text-xs font-bold text-navy">
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-navy">
+                  {h.streetName}
+                </p>
+                <div className="mt-1 h-1.5 w-full rounded-full bg-navy/5">
+                  <div
+                    className="h-1.5 rounded-full bg-impass"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        (h.floodEvents / (hotspots[0]?.floodEvents || 1)) * 100,
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-bold text-impass">
+                  {h.floodEvents}×
+                </p>
+                <p className="text-[10px] text-navy/50">peak {h.peakCm}cm</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Customized Flood Report */}
+      <section className="rounded-2xl border border-navy/10 bg-white p-4">
+        <h2 className="font-bold text-navy">Customized flood report</h2>
+        <p className="mt-1 text-xs text-navy/60">
+          Export the historical sensor data for this period for planning or
+          site-risk analysis.
+        </p>
+
+        <button
+          type="button"
+          onClick={downloadReport}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white"
+        >
+          <FileDown className="h-4 w-4" />
+          Generate report · {windowReadings.length} readings (CSV)
+        </button>
+
+        <p className="mt-2 text-[10px] text-navy/40">
+          Custom reports priced ₱5,000–₱20,000 per the period and area covered.
         </p>
       </section>
 
+      {/* Subscription Tiers */}
+      <section className="rounded-2xl border border-navy/10 bg-white p-4">
+        <h2 className="font-bold text-navy">Dashboard subscription</h2>
+        <p className="mt-1 text-xs text-navy/50">
+          Monthly monitoring access by organization size.
+        </p>
+
+        <div className="mt-3 space-y-2">
+          {TIERS.map((t) => (
+            <div
+              key={t.name}
+              className={`flex items-center justify-between rounded-xl border p-3 ${
+                t.current
+                  ? "border-[#247A60]/40 bg-[#E8F3EF]"
+                  : "border-navy/10 bg-white"
+              }`}
+            >
+              <div>
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-navy">
+                  {!t.current && <Lock className="h-3 w-3 text-navy/30" />}
+                  {t.name}
+                </p>
+                <p className="text-[10px] text-navy/50">{t.who}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-navy">{t.price}</p>
+                {t.current ? (
+                  <p className="text-[10px] font-semibold text-[#247A60]">
+                    Current plan
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-navy/40">/ month</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <p className="text-center text-[10px] text-navy/40">
-        Business / Institutional Dashboard · Sample preview
+        Business / Institutional Dashboard · Demo data, clearly labeled
       </p>
     </div>
+  );
+}
+
+const TIERS = [
+  {
+    name: "Basic",
+    who: "Single business or condo",
+    price: "₱1,500–3,000",
+    current: false,
+  },
+  {
+    name: "Institutional",
+    who: "DLSU Admin, large institutions",
+    price: "₱8,000–15,000",
+    current: true,
+  },
+  {
+    name: "LGU / Barangay",
+    who: "Multi-zone coverage",
+    price: "₱15,000–30,000",
+    current: false,
+  },
+];
+
+// Simple SVG line chart for the averaged water-level series.
+function TrendChart({
+  points,
+  threshold,
+}: {
+  points: { t: number; cm: number }[];
+  threshold: number;
+}) {
+  const W = 300;
+  const H = 90;
+  const pad = 4;
+
+  if (points.length < 2) {
+    return (
+      <p className="mt-4 text-xs text-navy/40">Not enough data to chart.</p>
+    );
+  }
+
+  const maxCm = Math.max(threshold + 10, ...points.map((p) => p.cm));
+  const x = (i: number) =>
+    pad + (i / (points.length - 1)) * (W - pad * 2);
+  const y = (cm: number) =>
+    pad + (1 - cm / maxCm) * (H - pad * 2);
+
+  const line = points.map((p, i) => `${x(i)},${y(p.cm)}`).join(" ");
+  const area = `${pad},${H - pad} ${line} ${W - pad},${H - pad}`;
+  const thresholdY = y(threshold);
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="mt-3 h-24 w-full"
+      preserveAspectRatio="none"
+    >
+      <polygon points={area} fill="#247A60" opacity={0.08} />
+      <line
+        x1={pad}
+        x2={W - pad}
+        y1={thresholdY}
+        y2={thresholdY}
+        stroke="#c93a3a"
+        strokeWidth={1}
+        strokeDasharray="4 3"
+      />
+      <polyline
+        points={line}
+        fill="none"
+        stroke="#247A60"
+        strokeWidth={1.5}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 

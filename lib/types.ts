@@ -30,6 +30,15 @@ export interface Report {
   comments?: number;
 }
 
+// A single historical water-level reading from one IoT sensor.
+// Used by the business dashboard's historical analytics.
+export interface SensorReading {
+  sensorId: string;
+  streetName: string;
+  cm: number;
+  timestamp: string;
+}
+
 export interface Comment {
   id: string;
   reportId: string;

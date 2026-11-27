@@ -8,11 +8,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Announcement, Comment, Report, SocialPost } from "./types";
+import type {
+  Announcement,
+  Comment,
+  Report,
+  SensorReading,
+  SocialPost,
+} from "./types";
 import {
   seedAnnouncements,
   seedComments,
   seedReports,
+  seedSensorHistory,
   seedSensors,
   seedSocial,
 } from "@/data/seed";
@@ -26,6 +33,7 @@ export type NewReport = Omit<Report, "id" | "timestamp" | "source">;
 interface StoreValue {
   reports: Report[];
   sensors: Report[];
+  sensorHistory: SensorReading[];
   announcements: Announcement[];
   social: SocialPost[];
   comments: Comment[];
@@ -123,6 +131,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const value: StoreValue = {
     reports,
     sensors: seedSensors,
+    sensorHistory: seedSensorHistory,
     announcements: seedAnnouncements,
     social: seedSocial,
     comments,

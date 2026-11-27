@@ -2,6 +2,7 @@ import type {
   Announcement,
   Comment,
   Report,
+  SensorReading,
   SocialPost,
 } from "@/lib/types";
 
@@ -210,6 +211,63 @@ export const seedSensors: Report[] = [
     timestamp: minsAgo(5),
   },
 ];
+
+// --- Historical sensor readings (demo data for the business dashboard) ---
+// Deterministic generator: 14 days of hourly water-level readings for the
+// four pilot sensors. Agno St floods most often so the hotspot ranking has a
+// clear #1. Seeded so every reload shows the same history.
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+interface SensorMeta {
+  sensorId: string;
+  streetName: string;
+  base: number; // dry-weather water level (cm)
+  floodChance: number; // hourly probability a storm surge starts
+  seed: number;
+}
+
+const SENSOR_META: SensorMeta[] = [
+  { sensorId: "s-01", streetName: "Taft Ave cor. Vito Cruz", base: 10, floodChance: 0.03, seed: 101 },
+  { sensorId: "s-02", streetName: "Agno St (Fidel A. Reyes)", base: 14, floodChance: 0.06, seed: 202 },
+  { sensorId: "s-03", streetName: "Taft Ave cor. Dagonoy", base: 12, floodChance: 0.05, seed: 303 },
+  { sensorId: "s-04", streetName: "Estrada St", base: 7, floodChance: 0.02, seed: 404 },
+];
+
+function buildSensorHistory(hours = 336): SensorReading[] {
+  const now = Date.now();
+  const readings: SensorReading[] = [];
+  for (const s of SENSOR_META) {
+    const rand = mulberry32(s.seed);
+    let surge = 0;
+    for (let h = hours; h >= 0; h--) {
+      const t = now - h * 3_600_000;
+      const hourOfDay = new Date(t).getHours();
+      const diurnal = hourOfDay >= 14 && hourOfDay <= 20 ? 4 : 0; // afternoon rains
+      if (rand() < s.floodChance) surge = 38 + rand() * 42; // storm starts
+      const noise = (rand() - 0.5) * 6;
+      const cm = Math.max(0, Math.round(s.base + diurnal + noise + surge));
+      surge *= 0.6; // recede each hour
+      readings.push({
+        sensorId: s.sensorId,
+        streetName: s.streetName,
+        cm,
+        timestamp: new Date(t).toISOString(),
+      });
+    }
+  }
+  return readings;
+}
+
+export const seedSensorHistory: SensorReading[] = buildSensorHistory();
 
 export const seedComments: Comment[] = [
   {
