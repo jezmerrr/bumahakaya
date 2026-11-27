@@ -8,6 +8,7 @@ import {
   severityInk,
   waterLevelLabel,
 } from "@/lib/severity";
+import { compressPhoto } from "@/lib/photo";
 import type { Severity, WaterLevel } from "@/lib/types";
 
 export interface ReportFormValues {
@@ -86,7 +87,12 @@ export function ReportForm({
 
   function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) setPhotoUrl(URL.createObjectURL(file));
+    if (!file) return;
+    // Save a compressed copy so the photo survives a reload; if the browser
+    // can't, fall back to a link that works for this visit.
+    compressPhoto(file)
+      .then(setPhotoUrl)
+      .catch(() => setPhotoUrl(URL.createObjectURL(file)));
   }
 
   function handleSubmit(e: FormEvent) {

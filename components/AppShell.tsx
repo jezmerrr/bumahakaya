@@ -43,7 +43,7 @@ export function AppShell() {
     Home: <HomeSection onOpenMap={() => setTab("Maps")} />,
     Maps: <MapSection />,
     Report: <ReportSection onPosted={() => setTab("Home")} />,
-    Alerts: <AlertsSection />,
+    Alerts: <AlertsSection onOpenMap={() => setTab("Maps")} />,
     Profile: (
       <ProfileSection
         onLogout={() => {

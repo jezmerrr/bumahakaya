@@ -1,14 +1,14 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
+import { useId, useState } from "react";
 import { severityColor, severityInk, severityShort } from "@/lib/severity";
 import { relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
-import { CommentIcon, ThumbsUpIcon, UserIcon } from "./icons";
+import { CameraIcon, CommentIcon, ThumbsUpIcon, UserIcon } from "./icons";
 import { EditReportSheet, ReportDetail } from "./ReportDetail";
 import { ConfirmDeleteDialog } from "./Sheet";
 import { OwnerActions, SensorBar } from "./ui";
@@ -32,6 +32,7 @@ export function ReportCard({
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
+  const photoLabelId = useId();
   const title = report.headline ?? report.streetName;
   const body = report.description ?? report.note;
   const color = severityColor(report.severity);
@@ -52,66 +53,66 @@ export function ReportCard({
   return (
     <article
       data-testid="report-card"
-      className="rounded-3xl bg-surface p-3.5 shadow-sm"
+      className="overflow-hidden rounded-3xl bg-surface shadow-sm"
     >
-      {/* Tapping anywhere in this block opens the details page. The title
-          button's ::after stretches over the whole block, so there is one
-          real button (good for screen readers) but a big tap target. */}
-      <div className="relative flex gap-3">
-        <span
-          aria-hidden="true"
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl"
-          style={{ backgroundColor: `${color}1f`, color: ink }}
-        >
-          <UserIcon className="h-5 w-5" />
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <h3 className="line-clamp-1 font-display text-[15px] font-extrabold leading-snug text-ink">
-            <button
-              type="button"
-              onClick={() => setDetailOpen(true)}
-              className="text-left after:absolute after:-inset-1.5 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-signal active:after:bg-ink/5"
-            >
-              {title}
-            </button>
-          </h3>
-          {body ? (
-            <p className="line-clamp-1 text-sm text-ink/70">{body}</p>
-          ) : null}
-          <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-ink/70">
-            <span
-              className="inline-flex shrink-0 items-center gap-1 font-semibold"
-              style={{ color: ink }}
-            >
-              <span
-                aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: color }}
-              />
-              {severityShort(report.severity)}
-            </span>
-            <span aria-hidden="true">·</span>
-            <span className="truncate">{report.streetName}</span>
-            <span aria-hidden="true">·</span>
-            <span className="shrink-0">
-              {relativeTime(report.timestamp)}
-              {report.editedAt ? " · Edited" : ""}
-            </span>
-          </p>
-        </div>
-
+      {/* Tapping anywhere in this block (photo strip included) opens the
+          details page. The title button's ::after stretches over the whole
+          block, so there is one real button (good for screen readers) but a
+          big tap target. */}
+      <div className="relative">
         {report.photoUrl ? (
-          <img
-            src={report.photoUrl}
-            alt={`Flood at ${report.streetName}`}
-            className="h-14 w-14 shrink-0 rounded-xl object-cover"
-          />
+          <PhotoPeek src={report.photoUrl} labelId={photoLabelId} />
         ) : null}
+
+        <div className="flex gap-3 px-3.5 pt-3.5">
+          <span
+            aria-hidden="true"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl"
+            style={{ backgroundColor: `${color}1f`, color: ink }}
+          >
+            <UserIcon className="h-5 w-5" />
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-1 font-display text-[15px] font-extrabold leading-snug text-ink">
+              <button
+                type="button"
+                onClick={() => setDetailOpen(true)}
+                aria-describedby={report.photoUrl ? photoLabelId : undefined}
+                className="text-left after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-signal active:after:bg-ink/5"
+              >
+                {title}
+              </button>
+            </h3>
+            {body ? (
+              <p className="line-clamp-1 text-sm text-ink/70">{body}</p>
+            ) : null}
+            <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-ink/70">
+              <span
+                className="inline-flex shrink-0 items-center gap-1 font-semibold"
+                style={{ color: ink }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: color }}
+                />
+                {severityShort(report.severity)}
+              </span>
+              <span aria-hidden="true">·</span>
+              <span className="truncate">{report.streetName}</span>
+              <span aria-hidden="true">·</span>
+              <span className="shrink-0">
+                {relativeTime(report.timestamp)}
+                {report.editedAt ? " · Edited" : ""}
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
 
       {report.sensorCm != null ? (
-        <div className="mt-2.5 pl-14">
+        <div className="mt-2.5 pl-[4.375rem] pr-3.5">
           <SensorBar
             cm={report.sensorCm}
             trend={report.trend}
@@ -121,7 +122,7 @@ export function ReportCard({
         </div>
       ) : null}
 
-      <div className="mt-2 flex items-center gap-1 border-t border-ink/5 pt-2">
+      <div className="mx-3.5 mb-2.5 mt-2 flex items-center gap-1 border-t border-ink/5 pt-2">
         <button
           type="button"
           onClick={toggleConfirm}
@@ -157,7 +158,7 @@ export function ReportCard({
       </div>
 
       {commentsOpen ? (
-        <div className="mt-2 border-t border-ink/5 pt-3">
+        <div className="mx-3.5 mb-3.5 border-t border-ink/5 pt-3">
           <CommentThread reportId={report.id} />
         </div>
       ) : null}
@@ -188,5 +189,31 @@ export function ReportCard({
         />
       ) : null}
     </article>
+  );
+}
+
+// A frosted peek at the top of the post's photo. The full, sharp photo is on
+// the details page; the strip itself is part of the card's tap area.
+function PhotoPeek({ src, labelId }: { src: string; labelId: string }) {
+  return (
+    <div className="relative h-14 overflow-hidden">
+      <img
+        src={src}
+        alt=""
+        className="absolute inset-0 h-full w-full scale-110 object-cover object-top blur-[5px]"
+      />
+      {/* Glass: a soft tint that fades into the card */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-linear-to-b from-surface/10 via-surface/30 to-surface/80"
+      />
+      <span
+        id={labelId}
+        className="absolute bottom-1.5 left-3.5 inline-flex items-center gap-1.5 rounded-full border border-edge bg-surface/70 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-md"
+      >
+        <CameraIcon aria-hidden="true" className="h-3.5 w-3.5" />
+        Photo · tap to view
+      </span>
+    </div>
   );
 }

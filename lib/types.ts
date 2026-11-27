@@ -17,6 +17,8 @@ export interface Report {
   waterLevel: WaterLevel;
   passable: boolean;
   photoUrl?: string;
+  // Who took the photo, shown under it on the details page.
+  photoCredit?: string;
   note?: string;
   source: Source;
   timestamp: string;

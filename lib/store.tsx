@@ -76,12 +76,24 @@ function makeId(): string {
   return `r-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+// Browsers that saved posts before the sample photos existed keep their old
+// copies, so give untouched sample posts their photo back. Posts the user
+// edited (they may have removed the photo on purpose) are left alone.
+export function withSeedPhotos(stored: Report[]): Report[] {
+  const seedById = new Map(seedReports.map((r) => [r.id, r]));
+  return stored.map((r) => {
+    const seed = seedById.get(r.id);
+    if (!seed?.photoUrl || r.photoUrl || r.editedAt) return r;
+    return { ...r, photoUrl: seed.photoUrl, photoCredit: seed.photoCredit };
+  });
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<Report[]>(seedReports);
   const [comments, setComments] = useState<Comment[]>(seedComments);
 
   useEffect(() => {
-    setReports(loadJSON(REPORTS_KEY, seedReports));
+    setReports(withSeedPhotos(loadJSON(REPORTS_KEY, seedReports)));
     setComments(loadJSON(COMMENTS_KEY, seedComments));
   }, []);
 
