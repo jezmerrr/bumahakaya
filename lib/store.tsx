@@ -29,6 +29,9 @@ const REPORTS_KEY = "bk.reports.v1";
 const COMMENTS_KEY = "bk.comments.v1";
 
 export type NewReport = Omit<Report, "id" | "timestamp" | "source">;
+export type ReportChanges = Partial<
+  Omit<Report, "id" | "timestamp" | "source" | "author" | "editedAt">
+>;
 
 interface StoreValue {
   reports: Report[];
@@ -39,6 +42,7 @@ interface StoreValue {
   comments: Comment[];
   addReport: (input: NewReport) => void;
   addComment: (reportId: string, text: string) => void;
+  updateReport: (id: string, changes: ReportChanges) => void;
   removeReport: (id: string) => void;
   removeComment: (id: string) => void;
 }
@@ -112,6 +116,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const updateReport = useCallback((id: string, changes: ReportChanges) => {
+    const editedAt = new Date().toISOString();
+    setReports((prev) => {
+      const next = prev.map((r) =>
+        r.id === id ? { ...r, ...changes, editedAt } : r,
+      );
+      save(REPORTS_KEY, next);
+      return next;
+    });
+  }, []);
+
   const removeReport = useCallback((id: string) => {
     setReports((prev) => {
       const next = prev.filter((r) => r.id !== id);
@@ -137,6 +152,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     comments,
     addReport,
     addComment,
+    updateReport,
     removeReport,
     removeComment,
   };

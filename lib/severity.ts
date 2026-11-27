@@ -18,6 +18,16 @@ const SHORT_LABELS: Record<Severity, string> = {
   Impassable: "Not passable",
 };
 
+const WATER_LABELS: Record<WaterLevel, string> = {
+  Ankle: "Ankle-deep",
+  Knee: "Knee-deep",
+  "Waist+": "Waist-deep",
+};
+
+export function waterLevelLabel(level: WaterLevel): string {
+  return WATER_LABELS[level];
+}
+
 export function severityShort(severity: Severity): string {
   return SHORT_LABELS[severity];
 }

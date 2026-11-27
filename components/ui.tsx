@@ -1,5 +1,7 @@
 import { severityColor, severityShort } from "@/lib/severity";
 import type { Severity, Trend } from "@/lib/types";
+import type { ReactNode } from "react";
+import { PencilIcon, TrashIcon } from "./icons";
 
 export function initialsOf(name: string): string {
   const parts = name.split(/[\s._@/]+/).filter(Boolean);
@@ -37,7 +39,7 @@ export function StatusPill({ severity }: { severity: Severity }) {
   );
 }
 
-function formatDistance(m: number): string {
+export function formatDistance(m: number): string {
   return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
 }
 
@@ -67,6 +69,56 @@ export function SensorBar({
         </span>
         {distanceM != null ? <span>{formatDistance(distanceM)}</span> : null}
       </div>
+    </div>
+  );
+}
+
+// Round icon-only button. Always pass a label: it becomes the accessible name
+// and the hover tooltip.
+export function IconButton({
+  label,
+  onClick,
+  tone = "neutral",
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  tone?: "neutral" | "danger";
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
+        tone === "danger"
+          ? "bg-impass/10 text-impass hover:bg-impass/15"
+          : "bg-navy/5 text-navy/60 hover:bg-navy/10"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Edit + delete controls shown only on the current user's own reports.
+export function OwnerActions({
+  onEdit,
+  onDelete,
+}: {
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-1.5 self-start">
+      <IconButton label="Edit report" onClick={onEdit}>
+        <PencilIcon className="h-4 w-4" />
+      </IconButton>
+      <IconButton label="Delete report" tone="danger" onClick={onDelete}>
+        <TrashIcon className="h-4 w-4" />
+      </IconButton>
     </div>
   );
 }

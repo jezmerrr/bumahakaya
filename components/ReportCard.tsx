@@ -1,13 +1,16 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { relativeTime } from "@/lib/time";
 import type { Report } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
-import { Avatar, SensorBar, StatusPill } from "./ui";
+import { CommentThread } from "./CommentThread";
 import { CommentIcon, MapPinIcon, ThumbsUpIcon } from "./icons";
+import { EditReportSheet, ReportDetail } from "./ReportDetail";
+import { ConfirmDeleteDialog } from "./Sheet";
+import { Avatar, OwnerActions, SensorBar, StatusPill } from "./ui";
 
 export function ReportCard({
   report,
@@ -16,15 +19,17 @@ export function ReportCard({
   report: Report;
   distanceM?: number;
 }) {
-  const { comments, addComment, removeReport, removeComment } = useStore();
-  const thread = comments.filter((c) => c.reportId === report.id);
+  const { comments, removeReport } = useStore();
+  const commentCount = comments.filter((c) => c.reportId === report.id).length;
   const isMine =
     report.source === "community" && report.author === CURRENT_USER.handle;
 
   const [confirms, setConfirms] = useState(report.confirms ?? 0);
   const [confirmed, setConfirmed] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState("");
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const title = report.headline ?? report.streetName;
   const body = report.description ?? report.note;
@@ -34,11 +39,18 @@ export function ReportCard({
     setConfirmed((v) => !v);
   }
 
-  function postComment(e: FormEvent) {
-    e.preventDefault();
-    addComment(report.id, draft);
-    setDraft("");
+  function deleteReport() {
+    setConfirmingDelete(false);
+    setDetailOpen(false);
+    removeReport(report.id);
   }
+
+  const ownerActions = isMine ? (
+    <OwnerActions
+      onEdit={() => setEditing(true)}
+      onDelete={() => setConfirmingDelete(true)}
+    />
+  ) : null;
 
   return (
     <article
@@ -55,6 +67,7 @@ export function ReportCard({
             <span className="text-navy/40">
               {" "}
               · {relativeTime(report.timestamp)}
+              {report.editedAt ? " · Edited" : ""}
             </span>
           </p>
           <p className="flex items-center gap-1 text-xs text-navy/50">
@@ -62,36 +75,43 @@ export function ReportCard({
             <span className="truncate">{report.streetName}</span>
           </p>
         </div>
-        {isMine ? (
-          <button
-            type="button"
-            aria-label="Remove report"
-            onClick={() => removeReport(report.id)}
-            className="shrink-0 self-start rounded-full bg-impass/10 px-2.5 py-1 text-[11px] font-semibold text-impass"
-          >
-            Remove
-          </button>
-        ) : null}
+        {ownerActions}
       </div>
 
-      <div className="mt-3 flex gap-3">
-        <div className="min-w-0 flex-1">
-          <h3 className="font-display text-base font-extrabold leading-snug text-navy">
-            {title}
-          </h3>
-          {body ? <p className="mt-1 text-sm text-navy/60">{body}</p> : null}
+      {/* Tapping anywhere in this block opens the details page. The title
+          button's ::after stretches over the whole block, so there is one
+          real button (good for screen readers) but a big tap target. */}
+      <div className="relative mt-3">
+        <div className="flex gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 font-display text-base font-extrabold leading-snug text-navy">
+              <button
+                type="button"
+                onClick={() => setDetailOpen(true)}
+                className="text-left after:absolute after:-inset-1.5 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-signal active:after:bg-navy/5"
+              >
+                {title}
+              </button>
+            </h3>
+            {body ? (
+              <p className="mt-1 line-clamp-2 text-sm text-navy/60">{body}</p>
+            ) : null}
+          </div>
+          {report.photoUrl ? (
+            <img
+              src={report.photoUrl}
+              alt={`Flood at ${report.streetName}`}
+              className="h-20 w-24 shrink-0 rounded-xl object-cover"
+            />
+          ) : null}
         </div>
-        {report.photoUrl ? (
-          <img
-            src={report.photoUrl}
-            alt={`Flood at ${report.streetName}`}
-            className="h-20 w-24 shrink-0 rounded-xl object-cover"
-          />
-        ) : null}
-      </div>
 
-      <div className="mt-3">
-        <StatusPill severity={report.severity} />
+        <div className="mt-3 flex items-center justify-between">
+          <StatusPill severity={report.severity} />
+          <span aria-hidden="true" className="text-xs font-semibold text-signal">
+            View details ›
+          </span>
+        </div>
       </div>
 
       {report.sensorCm != null ? (
@@ -118,67 +138,44 @@ export function ReportCard({
         </button>
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
+          onClick={() => setCommentsOpen((v) => !v)}
+          aria-expanded={commentsOpen}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-navy/5 py-2 text-sm font-semibold text-navy/70"
         >
-          <CommentIcon className="h-4 w-4" /> Comments ({thread.length})
+          <CommentIcon className="h-4 w-4" /> Comments ({commentCount})
         </button>
       </div>
 
-      {open ? (
+      {commentsOpen ? (
         <div className="mt-3 border-t border-navy/10 pt-3">
-          {thread.length === 0 ? (
-            <p className="text-xs text-navy/40">
-              Wala pang comments. Ikaw ang mauna.
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {thread.map((c) => (
-                <li key={c.id} className="flex gap-2">
-                  <Avatar name={c.author} className="h-7 w-7 text-[10px]" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs">
-                      <span className="font-semibold text-navy">
-                        {c.author}
-                      </span>
-                      <span className="text-navy/40">
-                        {" "}
-                        · {relativeTime(c.timestamp)}
-                      </span>
-                      {c.author === CURRENT_USER.handle ? (
-                        <button
-                          type="button"
-                          aria-label="Remove comment"
-                          onClick={() => removeComment(c.id)}
-                          className="ml-2 font-semibold text-impass"
-                        >
-                          Remove
-                        </button>
-                      ) : null}
-                    </p>
-                    <p className="text-sm text-navy/70">{c.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <form onSubmit={postComment} className="mt-3 flex gap-2">
-            <input
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="Add a comment…"
-              className="min-w-0 flex-1 rounded-full border border-navy/15 bg-white px-3 py-2 text-sm"
-            />
-            <button
-              type="submit"
-              className="rounded-full bg-signal px-4 py-2 text-sm font-semibold text-white"
-            >
-              Post
-            </button>
-          </form>
+          <CommentThread reportId={report.id} />
         </div>
+      ) : null}
+
+      {/* Overlays render into <body>; listed in stacking order. */}
+      {detailOpen ? (
+        <ReportDetail
+          report={report}
+          distanceM={distanceM}
+          confirms={confirms}
+          confirmed={confirmed}
+          onToggleConfirm={toggleConfirm}
+          isMine={isMine}
+          onEdit={() => setEditing(true)}
+          onDelete={() => setConfirmingDelete(true)}
+          onClose={() => setDetailOpen(false)}
+        />
+      ) : null}
+      {editing ? (
+        <EditReportSheet report={report} onClose={() => setEditing(false)} />
+      ) : null}
+      {confirmingDelete ? (
+        <ConfirmDeleteDialog
+          title="Delete this report?"
+          message="It will be removed from the feed and from My reports. This can't be undone."
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={deleteReport}
+        />
       ) : null}
     </article>
   );

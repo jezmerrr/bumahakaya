@@ -14,7 +14,9 @@ This is an **MVP** (by FloodWatch). It is mobile-first web app.
   green = *madadaanan / passable*, amber = *mag-ingat / gutter-deep*,
   red = *hindi madaanan / not passable*. A banner warns when flooding is reported
   near you.
-- **Feed** — community reports and sensor readings, newest first.
+- **Feed** — community reports and sensor readings, newest first. Search by street
+  or keyword, filter by source and road condition, and tap a report for its full
+  details. Your own reports have edit (pencil) and delete (trash) buttons.
 - **Report** — submit a flood report anonymously: street, water level, road status,
   optional photo and note.
 - **Announcements** — official LGU / government advisories, labeled by agency.
