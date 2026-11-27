@@ -2,37 +2,68 @@
 import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 import { HomeSection } from "./HomeSection";
 import { StoreProvider } from "@/lib/store";
 
-function renderHome() {
+// The status card's mini map uses Leaflet, which can't run in jsdom.
+vi.mock("next/dynamic", async () => {
+  const { createElement } = await import("react");
+  return {
+    default: () =>
+      function MiniMapStub() {
+        return createElement("div", { "data-testid": "mini-map" });
+      },
+  };
+});
+
+function renderHome(onOpenMap = vi.fn()) {
   render(
     <StoreProvider>
-      <HomeSection />
+      <HomeSection onOpenMap={onOpenMap} />
     </StoreProvider>,
   );
+  return onOpenMap;
+}
+
+type User = ReturnType<typeof userEvent.setup>;
+
+// Open the Filters panel, run `pick`, then close it with "Show N posts".
+async function withFilters(user: User, pick: (panel: HTMLElement) => Promise<void>) {
+  await user.click(screen.getByRole("button", { name: /^filters/i }));
+  const panel = screen.getByRole("dialog", { name: "Filters" });
+  await pick(panel);
+  await user.click(within(panel).getByRole("button", { name: /^show \d+ posts?$/i }));
+  expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull();
 }
 
 describe("HomeSection", () => {
-  it("shows all posts by default", () => {
+  it("shows all posts by default", async () => {
+    const user = userEvent.setup();
     renderHome();
     expect(screen.getAllByTestId("report-card").length).toBeGreaterThan(0);
     expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    expect(screen.getByRole("button", { name: "Filters" })).toBeInTheDocument();
+    await withFilters(user, async (panel) => {
+      expect(within(panel).getByRole("button", { name: "All" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+    });
   });
 
   it("switches to social posts, then both with All", async () => {
     const user = userEvent.setup();
     renderHome();
 
-    await user.click(screen.getByRole("button", { name: "Social" }));
+    await withFilters(user, (panel) =>
+      user.click(within(panel).getByRole("button", { name: "Social" })),
+    );
     expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
     expect(screen.queryByTestId("report-card")).toBeNull();
+    expect(screen.getByRole("button", { name: "Filters (1 on)" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "All" }));
+    await user.click(screen.getByRole("button", { name: "Remove filter: Social" }));
     expect(screen.getAllByTestId("report-card").length).toBeGreaterThan(0);
     expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
   });
@@ -89,9 +120,11 @@ describe("HomeSection", () => {
   it("filters by road condition and hides social posts while on", async () => {
     const user = userEvent.setup();
     renderHome();
-    const notPassable = screen.getByRole("button", { name: "Not passable" });
-    await user.click(notPassable);
-    expect(notPassable).toHaveAttribute("aria-pressed", "true");
+    await withFilters(user, async (panel) => {
+      const notPassable = within(panel).getByRole("button", { name: "Not passable" });
+      await user.click(notPassable);
+      expect(notPassable).toHaveAttribute("aria-pressed", "true");
+    });
 
     const cards = screen.getAllByTestId("report-card");
     expect(cards.length).toBeGreaterThan(0);
@@ -100,23 +133,22 @@ describe("HomeSection", () => {
     }
     expect(screen.queryByTestId("social-card")).toBeNull();
 
-    // Tapping again turns it off.
-    await user.click(notPassable);
+    // Removing the chip turns it off.
+    await user.click(screen.getByRole("button", { name: "Remove filter: Not passable" }));
     expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
   });
 
   it("hides the condition filter for Social and resets it", async () => {
     const user = userEvent.setup();
     renderHome();
-    await user.click(screen.getByRole("button", { name: "Passable" }));
-    await user.click(screen.getByRole("button", { name: "Social" }));
-    expect(
-      screen.queryByRole("group", { name: /road condition/i }),
-    ).toBeNull();
-    expect(screen.getAllByTestId("social-card").length).toBeGreaterThan(0);
+    await user.click(screen.getByRole("button", { name: /^filters/i }));
+    const panel = screen.getByRole("dialog", { name: "Filters" });
+    await user.click(within(panel).getByRole("button", { name: "Passable" }));
+    await user.click(within(panel).getByRole("button", { name: "Social" }));
+    expect(within(panel).queryByRole("group", { name: /road condition/i })).toBeNull();
 
-    await user.click(screen.getByRole("button", { name: "All" }));
-    expect(screen.getByRole("button", { name: "Passable" })).toHaveAttribute(
+    await user.click(within(panel).getByRole("button", { name: "All" }));
+    expect(within(panel).getByRole("button", { name: "Passable" })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
@@ -173,5 +205,43 @@ describe("HomeSection", () => {
     expect(
       within(card).getByRole("button", { name: /confirm \(\s*13\s*\)/i }),
     ).toBeInTheDocument();
+  });
+
+  it("leads with a status card for the area", async () => {
+    const user = userEvent.setup();
+    const onOpenMap = renderHome();
+    const hero = screen.getByRole("region", { name: /flood status near you/i });
+    expect(hero).toHaveAttribute("data-status", "Impassable");
+
+    // 1. Greeting + freshness
+    expect(within(hero).getByText(/^Magandang (umaga|hapon|gabi), John$/)).toBeInTheDocument();
+    expect(within(hero).getByText(/^Updated (just now|\d+[mhd] ago)$/)).toBeInTheDocument();
+    // 2. Headline: 4 reports/sensors marked not passable within 700 m
+    expect(
+      within(hero).getByRole("heading", { name: "4 roads not passable" }),
+    ).toBeInTheDocument();
+    expect(within(hero).getByText("Near you · 2 reports · 2 sensors")).toBeInTheDocument();
+    // 3. The one to avoid
+    expect(within(hero).getByText("Iwasan muna")).toBeInTheDocument();
+    expect(within(hero).getByText("Dagonoy side hindi madaanan")).toBeInTheDocument();
+    expect(within(hero).getByText(/^Waist-deep · \d+ m away$/)).toBeInTheDocument();
+    // 5. Stats
+    for (const label of ["Reports nearby", "Deepest", "Closest"]) {
+      expect(within(hero).getByText(label)).toBeInTheDocument();
+    }
+
+    await user.click(within(hero).getByRole("button", { name: "Open flood map" }));
+    expect(onOpenMap).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the worst reports straight from the status card", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    await user.click(screen.getByRole("button", { name: "See all not passable reports" }));
+    expect(screen.getByRole("button", { name: "Remove filter: Not passable" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("2 results · community reports only");
+    for (const card of screen.getAllByTestId("report-card")) {
+      expect(within(card).getByText("Not passable")).toBeInTheDocument();
+    }
   });
 });

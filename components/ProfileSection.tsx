@@ -54,7 +54,7 @@ export function ProfileSection({
     return (
       <Subpage title="My reports" onBack={() => setView("menu")}>
         {myReports.length === 0 ? (
-          <p className="text-sm text-navy/50">
+          <p className="text-sm text-navy/65">
             Wala ka pang na-report. Mag-tap sa + button para mag-report ng baha.
           </p>
         ) : (
@@ -71,7 +71,7 @@ export function ProfileSection({
   if (view === "areas") {
     return (
       <Subpage title="Saved areas" onBack={() => setView("menu")}>
-        <p className="mb-3 text-sm text-navy/50">
+        <p className="mb-3 text-sm text-navy/65">
           Save the streets you pass often para mabilis mo silang ma-check.
         </p>
 
@@ -95,7 +95,7 @@ export function ProfileSection({
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
                     isSaved
                       ? "bg-signal text-white"
-                      : "border border-navy/20 text-navy/60"
+                      : "border border-navy/20 text-navy/70"
                   }`}
                 >
                   {isSaved ? "Saved" : "Save"}
@@ -130,7 +130,7 @@ export function ProfileSection({
           {CURRENT_USER.name}
         </h2>
 
-        <p className="text-sm text-navy/50">{CURRENT_USER.role}</p>
+        <p className="text-sm text-navy/65">{CURRENT_USER.role}</p>
       </div>
 
       <div className="mt-5 flex rounded-3xl bg-white p-4 shadow-sm">
@@ -139,7 +139,7 @@ export function ProfileSection({
             <p className="font-display text-xl font-extrabold text-navy">
               {s.value}
             </p>
-            <p className="text-xs text-navy/50">{s.label}</p>
+            <p className="text-xs text-navy/65">{s.label}</p>
           </div>
         ))}
       </div>
@@ -151,7 +151,7 @@ export function ProfileSection({
           onClick={() => setView("reports")}
           className="flex w-full items-center justify-between px-4 py-4 text-left text-sm font-semibold text-navy"
         >
-          My reports <span className="text-navy/30">›</span>
+          My reports <span className="text-navy/45">›</span>
         </button>
 
         <div className="mx-4 border-t border-navy/10" />
@@ -161,7 +161,7 @@ export function ProfileSection({
           onClick={() => setView("areas")}
           className="flex w-full items-center justify-between px-4 py-4 text-left text-sm font-semibold text-navy"
         >
-          Saved areas <span className="text-navy/30">›</span>
+          Saved areas <span className="text-navy/45">›</span>
         </button>
 
         <div className="mx-4 border-t border-navy/10" />
@@ -219,16 +219,16 @@ export function ProfileSection({
               Business Dashboard
             </p>
 
-            <p className="mt-0.5 text-xs text-navy/50">
+            <p className="mt-0.5 text-xs text-navy/65">
               Monitor flood risks and business insights.
             </p>
           </div>
 
-          <span className="text-lg text-navy/30">›</span>
+          <span className="text-lg text-navy/45">›</span>
         </button>
       </div>
 
-      <p className="mt-4 text-center text-[11px] text-navy/40">
+      <p className="mt-4 text-center text-[11px] text-navy/60">
         Demo profile. Accounts are not part of this MVP.
       </p>
     </div>

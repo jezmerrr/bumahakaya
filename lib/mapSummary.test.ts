@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  areaStatus,
   countBySeverity,
   nearbyItems,
   newestTimestamp,
@@ -65,5 +66,27 @@ describe("countBySeverity and newestTimestamp", () => {
   it("finds the newest timestamp", () => {
     expect(newestTimestamp(all)).toBe(fresh.timestamp);
     expect(newestTimestamp([])).toBeNull();
+  });
+});
+
+describe("areaStatus", () => {
+  it("reports the worst condition, how many share it, and which to avoid", () => {
+    const deeper = report({ id: "deeper", lat: 14.5652, severity: "Impassable", waterLevel: "Waist+" });
+    const status = areaStatus(nearbyItems([...all, deeper], CENTER, 700, null));
+    expect(status.severity).toBe("Impassable");
+    expect(status.count).toBe(2);
+    expect([status.reports, status.sensors]).toEqual([2, 0]);
+    // Same condition and depth: the closer one comes first.
+    expect(status.worst?.report.id).toBe("deeper");
+  });
+
+  it("is all clear when nothing is nearby", () => {
+    expect(areaStatus([])).toEqual({
+      severity: "Passable",
+      count: 0,
+      reports: 0,
+      sensors: 0,
+      worst: null,
+    });
   });
 });

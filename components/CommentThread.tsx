@@ -25,7 +25,7 @@ export function CommentThread({ reportId }: { reportId: string }) {
   return (
     <div>
       {thread.length === 0 ? (
-        <p className="text-xs text-navy/40">
+        <p className="text-xs text-navy/60">
           Wala pang comments. Ikaw ang mauna.
         </p>
       ) : (
@@ -36,7 +36,7 @@ export function CommentThread({ reportId }: { reportId: string }) {
               <div className="min-w-0 flex-1">
                 <p className="text-xs">
                   <span className="font-semibold text-navy">{c.author}</span>
-                  <span className="text-navy/40">
+                  <span className="text-navy/60">
                     {" "}
                     · {relativeTime(c.timestamp)}
                   </span>
@@ -49,7 +49,7 @@ export function CommentThread({ reportId }: { reportId: string }) {
                   aria-label="Delete comment"
                   title="Delete comment"
                   onClick={() => setPendingDelete(c.id)}
-                  className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-full text-navy/40 hover:bg-impass/10 hover:text-impass"
+                  className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-full text-navy/60 hover:bg-impass/10 hover:text-impass"
                 >
                   <TrashIcon className="h-3.5 w-3.5" />
                 </button>

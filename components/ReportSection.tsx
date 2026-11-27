@@ -43,7 +43,7 @@ export function ReportSection({ onPosted }: { onPosted?: () => void }) {
       <h1 className="font-display text-2xl font-extrabold text-navy">
         Report flooding
       </h1>
-      <p className="text-sm text-navy/50">Help your neighbors stay safe</p>
+      <p className="text-sm text-navy/65">Help your neighbors stay safe</p>
     </ReportForm>
   );
 }

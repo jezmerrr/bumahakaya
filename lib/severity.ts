@@ -36,6 +36,19 @@ export function severityColor(severity: Severity): string {
   return COLORS[severity];
 }
 
+// Darker shades for text, icons, and anything with white text on it. The
+// bright colors above are for pins, dots, and bars; as text (or behind white
+// text) amber in particular is too light to read (2.4:1). These are all 5:1+.
+const INK: Record<Severity, string> = {
+  Passable: "#136f4c",
+  Caution: "#a35f0c",
+  Impassable: "#b42f2f",
+};
+
+export function severityInk(severity: Severity): string {
+  return INK[severity];
+}
+
 export function severityLabel(severity: Severity): string {
   return LABELS[severity];
 }

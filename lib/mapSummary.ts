@@ -75,3 +75,36 @@ export function newestTimestamp(markers: Report[]): string | null {
   for (const m of markers) if (!best || time(m) > time(best)) best = m;
   return best?.timestamp ?? null;
 }
+
+export interface AreaStatus {
+  // Worst road condition reported nearby (Passable when nothing is reported).
+  severity: Severity;
+  // How many nearby reports share that worst condition...
+  count: number;
+  // ...split into community reports and sensors (the feed only lists reports).
+  reports: number;
+  sensors: number;
+  // The one to warn about first: worst condition, then deepest, then closest.
+  worst: NearbyItem | null;
+}
+
+export function areaStatus(items: NearbyItem[]): AreaStatus {
+  if (items.length === 0)
+    return { severity: "Passable", count: 0, reports: 0, sensors: 0, worst: null };
+  const ranked = [...items].sort(
+    (a, b) =>
+      WORST_FIRST[a.report.severity] - WORST_FIRST[b.report.severity] ||
+      DEPTH_RANK[b.report.waterLevel] - DEPTH_RANK[a.report.waterLevel] ||
+      a.distanceM - b.distanceM,
+  );
+  const severity = ranked[0].report.severity;
+  const same = items.filter((i) => i.report.severity === severity);
+  const sensors = same.filter((i) => i.report.source === "sensor").length;
+  return {
+    severity,
+    count: same.length,
+    reports: same.length - sensors,
+    sensors,
+    worst: ranked[0],
+  };
+}
