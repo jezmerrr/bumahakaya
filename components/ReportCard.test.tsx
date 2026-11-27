@@ -162,3 +162,31 @@ describe("ReportCard ownership", () => {
     expect(document.body.style.overflow).toBe("");
   });
 });
+
+describe("ReportCard photos", () => {
+  it("shows a frosted peek of the photo and the full photo on the details page", async () => {
+    const user = userEvent.setup();
+    renderCard(); // r-001 has a sample photo
+    const card = screen.getByTestId("report-card");
+    expect(within(card).getByText("Photo · tap to view")).toBeInTheDocument();
+    const open = within(card).getByRole("button", { name: "Flooding Taft Ave cor. Estrada" });
+    expect(open).toHaveAccessibleDescription("Photo · tap to view");
+
+    await user.click(open);
+    const details = screen.getByRole("dialog", { name: /report details/i });
+    const photo = within(details).getByRole("img", { name: "Flood at Taft Avenue, Malate" });
+    expect(photo).toHaveAttribute("src", "/demo/flood-taft-estrada.jpg");
+    expect(within(details).getByText("Photo: Rammuel Balbuena / ARCHX")).toBeInTheDocument();
+  });
+
+  it("has no photo strip when the post has no photo", () => {
+    const noPhoto = seedReports.find((r) => r.id === "r-003")!;
+    expect(noPhoto.photoUrl).toBeUndefined();
+    render(
+      <StoreProvider>
+        <ReportCard report={noPhoto} />
+      </StoreProvider>,
+    );
+    expect(screen.queryByText("Photo · tap to view")).toBeNull();
+  });
+});

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { StoreProvider, useStore } from "./store";
+import { StoreProvider, useStore, withSeedPhotos } from "./store";
 import { seedReports, seedComments } from "@/data/seed";
 
 function CommentProbe() {
@@ -178,5 +178,30 @@ describe("store", () => {
     expect(screen.getByTestId("count").textContent).toBe(
       String(seedReports.length),
     );
+  });
+});
+
+describe("withSeedPhotos", () => {
+  // A copy of the sample posts saved before photos were added.
+  const oldCopy = seedReports.map(({ photoUrl, photoCredit, ...r }) => {
+    void photoUrl;
+    void photoCredit;
+    return r;
+  });
+
+  it("gives untouched sample posts their photo back", () => {
+    const r1 = withSeedPhotos(oldCopy).find((r) => r.id === "r-001")!;
+    expect(r1.photoUrl).toBe("/demo/flood-taft-estrada.jpg");
+    expect(r1.photoCredit).toBe("Rammuel Balbuena / ARCHX");
+  });
+
+  it("leaves edited posts and the user's own photos alone", () => {
+    const edited = oldCopy.map((r) =>
+      r.id === "r-001" ? { ...r, editedAt: "2026-11-28T00:00:00Z" } : r,
+    );
+    expect(withSeedPhotos(edited).find((r) => r.id === "r-001")!.photoUrl).toBeUndefined();
+
+    const mine = { ...oldCopy[0], id: "user-1", photoUrl: "data:image/jpeg;base64,AAA" };
+    expect(withSeedPhotos([mine])[0].photoUrl).toBe("data:image/jpeg;base64,AAA");
   });
 });

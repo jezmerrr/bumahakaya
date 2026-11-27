@@ -8,6 +8,7 @@ import type { Report } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
 import { CommentThread } from "./CommentThread";
+import { DemoDataBadge } from "./DemoDataBadge";
 import { FloodScene } from "./FloodScene";
 import { ThumbsUpIcon } from "./icons";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
@@ -57,15 +58,26 @@ export function ReportDetail({
       }
     >
       <div className="space-y-3">
-        <FloodScene level={report.waterLevel} severity={report.severity} />
-
+        {/* The real photo comes first and is shown whole (not cropped). */}
         {report.photoUrl ? (
-          <img
-            src={report.photoUrl}
-            alt={`Flood at ${report.streetName}`}
-            className="max-h-72 w-full rounded-3xl object-cover"
-          />
+          <figure className="overflow-hidden rounded-3xl bg-surface shadow-sm">
+            <img
+              src={report.photoUrl}
+              alt={`Flood at ${report.streetName}`}
+              className="block h-auto w-full"
+            />
+            {report.photoCredit || report.photoUrl.startsWith("/demo/") ? (
+              <figcaption className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2.5 text-xs text-ink/70">
+                {report.photoCredit ? (
+                  <span>Photo: {report.photoCredit}</span>
+                ) : null}
+                {report.photoUrl.startsWith("/demo/") ? <DemoDataBadge /> : null}
+              </figcaption>
+            ) : null}
+          </figure>
         ) : null}
+
+        <FloodScene level={report.waterLevel} severity={report.severity} />
 
         <section className="rounded-3xl bg-surface p-4 shadow-sm">
           <div className="flex items-center gap-3">
