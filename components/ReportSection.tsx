@@ -40,10 +40,10 @@ export function ReportSection({ onPosted }: { onPosted?: () => void }) {
       onSubmit={post}
       className="px-4 pb-4 pt-4"
     >
-      <h1 className="font-display text-2xl font-extrabold text-navy">
+      <h1 className="font-display text-2xl font-extrabold text-ink">
         Report flooding
       </h1>
-      <p className="text-sm text-navy/65">Help your neighbors stay safe</p>
+      <p className="text-sm text-ink/65">Help your neighbors stay safe</p>
     </ReportForm>
   );
 }

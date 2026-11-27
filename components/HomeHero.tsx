@@ -17,14 +17,18 @@ import { formatDistance } from "./ui";
 
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-white/60" />,
+  loading: () => <div className="h-full w-full bg-surface/60" />,
 });
 
 // Sky behind the status card: the worse it is nearby, the warmer the sky.
+// Colors are CSS variables so the sky darkens in dark mode.
 const SKY: Record<Severity, string> = {
-  Passable: "linear-gradient(180deg, #8fd3f2 0%, #d9f0fb 55%, #ffffff 100%)",
-  Caution: "linear-gradient(180deg, #f6cf8f 0%, #fcebd0 55%, #ffffff 100%)",
-  Impassable: "linear-gradient(180deg, #f2a7a7 0%, #fbe0e0 55%, #ffffff 100%)",
+  Passable:
+    "linear-gradient(180deg, var(--sky-pass) 0%, var(--sky-pass-mid) 55%, var(--color-surface) 100%)",
+  Caution:
+    "linear-gradient(180deg, var(--sky-caution) 0%, var(--sky-caution-mid) 55%, var(--color-surface) 100%)",
+  Impassable:
+    "linear-gradient(180deg, var(--sky-impass) 0%, var(--sky-impass-mid) 55%, var(--color-surface) 100%)",
 };
 
 // Words after the big number, e.g. "4 roads not passable".
@@ -35,7 +39,7 @@ const HEADLINE: Record<Severity, (n: number) => string> = {
 };
 
 const GLASS =
-  "border border-white/70 bg-white/75 shadow-[0_8px_30px_rgba(11,37,69,0.10)] backdrop-blur-xl";
+  "border border-edge bg-surface/75 shadow-[0_8px_30px_rgba(11,37,69,0.10)] backdrop-blur-xl";
 
 // The first thing on Home: is it safe around me right now?
 // Layout, top to bottom: greeting + freshness, headline, the one street to
@@ -72,12 +76,12 @@ export function HomeHero({
     >
       {/* 1. Greeting + how fresh the data is */}
       <div className="flex items-center justify-between gap-3">
-        <p className="truncate text-sm font-semibold text-navy/70">
+        <p className="truncate text-sm font-semibold text-ink/70">
           {greeting()}, {firstName}
         </p>
         {updatedAt ? (
           <span
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-navy/70 ${GLASS}`}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-ink/70 ${GLASS}`}
           >
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-pass" />
             Updated {relativeTime(updatedAt)}
@@ -86,7 +90,7 @@ export function HomeHero({
       </div>
 
       {/* 2. Headline */}
-      <h1 className="mt-3 flex items-baseline gap-2 text-navy">
+      <h1 className="mt-3 flex items-baseline gap-2 text-ink">
         {clear ? null : (
           <>
             <span className="font-display text-5xl font-extrabold leading-none">
@@ -99,7 +103,7 @@ export function HomeHero({
           {HEADLINE[status.severity](status.count)}
         </span>
       </h1>
-      <p className="mt-1 text-sm text-navy/70">
+      <p className="mt-1 text-sm text-ink/70">
         {clear
           ? "Walang baha na naiulat malapit sa'yo."
           : `Near you · ${plural(status.reports, "report")} · ${plural(
@@ -125,7 +129,7 @@ export function HomeHero({
           )}
         </span>
         {clear || !worst ? (
-          <p className="min-w-0 flex-1 text-sm text-navy/70">
+          <p className="min-w-0 flex-1 text-sm text-ink/70">
             Madadaanan ang mga daan malapit sa&apos;yo. Ingat pa rin.
           </p>
         ) : (
@@ -137,10 +141,10 @@ export function HomeHero({
               >
                 Iwasan muna
               </p>
-              <p className="line-clamp-2 text-sm font-bold leading-snug text-navy">
+              <p className="line-clamp-2 text-sm font-bold leading-snug text-ink">
                 {worst.report.headline ?? worst.report.streetName}
               </p>
-              <p className="text-xs text-navy/65">
+              <p className="text-xs text-ink/65">
                 {waterLevelLabel(worst.report.waterLevel)} ·{" "}
                 {formatDistance(worst.distanceM)} away
               </p>
@@ -149,7 +153,7 @@ export function HomeHero({
               type="button"
               onClick={() => onShow(status.severity)}
               aria-label={`See all ${label} reports`}
-              className="shrink-0 rounded-full bg-navy px-3 py-1.5 text-xs font-semibold text-white"
+              className="shrink-0 rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-surface"
             >
               See all ›
             </button>
@@ -158,7 +162,7 @@ export function HomeHero({
       </div>
 
       {/* 4. Mini map preview; tapping it opens the Maps tab */}
-      <div className="relative mt-3 h-28 overflow-hidden rounded-2xl border border-white/70 shadow-sm">
+      <div className="relative mt-3 h-28 overflow-hidden rounded-2xl border border-edge shadow-sm">
         {/* `isolate` keeps Leaflet's z-indexes under the tap target */}
         <div className="absolute inset-0 isolate">
           <MapView center={center} markers={markers} zoom={15} interactive={false} />
@@ -169,14 +173,14 @@ export function HomeHero({
           aria-label="Open flood map"
           className="absolute inset-0 z-10 flex items-end justify-end p-2"
         >
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold text-navy ${GLASS}`}>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold text-ink ${GLASS}`}>
             Open map ›
           </span>
         </button>
       </div>
 
       {/* 5. Quick stats */}
-      <dl className={`mt-3 grid grid-cols-3 divide-x divide-navy/10 rounded-2xl py-3 ${GLASS}`}>
+      <dl className={`mt-3 grid grid-cols-3 divide-x divide-ink/10 rounded-2xl py-3 ${GLASS}`}>
         <Stat label="Reports nearby" value={String(summary?.count ?? 0)} />
         <Stat
           label="Deepest"
@@ -198,8 +202,8 @@ function plural(n: number, word: string): string {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 px-3">
-      <dt className="truncate text-[11px] text-navy/65">{label}</dt>
-      <dd className="truncate text-sm font-semibold text-navy">{value}</dd>
+      <dt className="truncate text-[11px] text-ink/65">{label}</dt>
+      <dd className="truncate text-sm font-semibold text-ink">{value}</dd>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from "@/lib/mapSummary";
 import {
   severityColor,
+  severityFill,
   severityInk,
   severityShort,
   waterLevelLabel,
@@ -41,15 +42,15 @@ const CONDITIONS: Severity[] = ["Impassable", "Caution", "Passable"];
 
 // Frosted-glass panels floating over the map.
 const GLASS =
-  "border border-white/70 bg-white/80 shadow-[0_8px_30px_rgba(11,37,69,0.14)] backdrop-blur-xl";
+  "border border-edge bg-surface/80 shadow-[0_8px_30px_rgba(11,37,69,0.14)] backdrop-blur-xl";
 // Smaller shadow for chips, so the scrolling row doesn't clip it into a band.
 const GLASS_CHIP =
-  "border border-white/70 bg-white/85 shadow-[0_2px_8px_rgba(11,37,69,0.12)] backdrop-blur-xl";
+  "border border-edge bg-surface/85 shadow-[0_2px_8px_rgba(11,37,69,0.12)] backdrop-blur-xl";
 
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-full w-full place-items-center bg-white text-sm text-navy/65">
+    <div className="grid h-full w-full place-items-center bg-surface text-sm text-ink/65">
       Loading map…
     </div>
   ),
@@ -146,10 +147,10 @@ export function MapSection() {
       {/* Title + road-condition chips */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 space-y-2 p-3">
         <div className={`pointer-events-auto inline-block rounded-2xl px-4 py-2.5 ${GLASS}`}>
-          <h1 className="font-display text-lg font-extrabold leading-tight text-navy">
+          <h1 className="font-display text-lg font-extrabold leading-tight text-ink">
             Flood map
           </h1>
-          <p className="text-xs text-navy/70">
+          <p className="text-xs text-ink/70">
             Near DLSU-Manila
             {newest ? ` · Updated ${relativeTime(newest)}` : ""}
           </p>
@@ -162,16 +163,16 @@ export function MapSection() {
           {CONDITIONS.map((s) => {
             const active = s === severity;
             const color = severityColor(s);
-            const ink = severityInk(s);
+            const fill = severityFill(s);
             return (
               <button
                 key={s}
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSeverity(active ? null : s)}
-                style={active ? { backgroundColor: ink, borderColor: ink } : undefined}
+                style={active ? { backgroundColor: fill, borderColor: fill } : undefined}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-semibold ${
-                  active ? "text-white shadow-md" : `text-navy/80 ${GLASS_CHIP}`
+                  active ? "text-white shadow-md" : `text-ink/80 ${GLASS_CHIP}`
                 }`}
               >
                 <span
@@ -180,7 +181,7 @@ export function MapSection() {
                   style={{ backgroundColor: active ? "#fff" : color }}
                 />
                 {severityShort(s)}
-                <span className={active ? "text-white/80" : "text-navy/65"}>
+                <span className={active ? "text-white/80" : "text-ink/65"}>
                   {counts[s]}
                 </span>
               </button>
@@ -197,11 +198,11 @@ export function MapSection() {
           <ControlButton label="Zoom in" onClick={() => map?.zoomIn()}>
             <PlusIcon className="h-5 w-5" />
           </ControlButton>
-          <span className="mx-2 border-t border-navy/10" />
+          <span className="mx-2 border-t border-ink/10" />
           <ControlButton label="Zoom out" onClick={() => map?.zoomOut()}>
             <MinusIcon className="h-5 w-5" />
           </ControlButton>
-          <span className="mx-2 border-t border-navy/10" />
+          <span className="mx-2 border-t border-ink/10" />
           <ControlButton label="Back to my location" onClick={recenter}>
             <LocateIcon className="h-[18px] w-[18px]" />
           </ControlButton>
@@ -230,7 +231,7 @@ export function MapSection() {
                 aria-pressed={active}
                 onClick={() => setView(key)}
                 className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold ${
-                  active ? "bg-navy text-white" : "text-navy/70"
+                  active ? "bg-ink text-surface" : "text-ink/70"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -285,7 +286,7 @@ function ControlButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="grid h-11 w-11 place-items-center text-navy/70 hover:bg-white/60 active:bg-navy/5"
+      className="grid h-11 w-11 place-items-center text-ink/70 hover:bg-surface/60 active:bg-ink/5"
     >
       {children}
     </button>
@@ -306,8 +307,8 @@ function SummaryCard({
     : `Reports within ${RADIUS_M} m`;
   return (
     <section aria-label="Nearby summary" className={`w-full rounded-3xl p-4 ${GLASS}`}>
-      <p className="text-xs font-semibold text-navy/70">{heading}</p>
-      <p className="font-display text-4xl font-extrabold leading-tight text-navy">
+      <p className="text-xs font-semibold text-ink/70">{heading}</p>
+      <p className="font-display text-4xl font-extrabold leading-tight text-ink">
         {summary?.count ?? 0}
       </p>
       {summary ? (
@@ -329,7 +330,7 @@ function SummaryCard({
           />
         </div>
       ) : (
-        <p className="mt-1 text-sm text-navy/70">
+        <p className="mt-1 text-sm text-ink/70">
           Walang reports dito ngayon. Try another filter.
         </p>
       )}
@@ -351,10 +352,10 @@ function Stat({
       type="button"
       onClick={onClick}
       aria-label={`${label}: ${value}. Show on map`}
-      className="rounded-2xl bg-white/60 px-2.5 py-2 text-left hover:bg-white active:bg-navy/5"
+      className="rounded-2xl bg-surface/60 px-2.5 py-2 text-left hover:bg-surface active:bg-ink/5"
     >
-      <span className="block text-[11px] text-navy/70">{label}</span>
-      <span className="block truncate text-sm font-semibold text-navy">
+      <span className="block text-[11px] text-ink/70">{label}</span>
+      <span className="block truncate text-sm font-semibold text-ink">
         {value}
       </span>
     </button>
@@ -389,16 +390,16 @@ function SelectedCard({
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-navy/65">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink/65">
             {sensor ? "FloodWatch sensor" : "Community report"} ·{" "}
             {relativeTime(report.timestamp)}
           </p>
-          <h2 className="line-clamp-2 font-display text-base font-extrabold leading-snug text-navy">
+          <h2 className="line-clamp-2 font-display text-base font-extrabold leading-snug text-ink">
             {report.headline ?? report.streetName}
           </h2>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <StatusPill severity={report.severity} />
-            <span className="text-xs text-navy/70">
+            <span className="text-xs text-ink/70">
               {waterLevelLabel(report.waterLevel)}
               {distanceM != null ? ` · ${formatDistance(distanceM)} away` : ""}
             </span>
@@ -408,7 +409,7 @@ function SelectedCard({
           type="button"
           aria-label="Close preview"
           onClick={onClose}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy/5 text-navy/70"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink/5 text-ink/70"
         >
           <XIcon className="h-4 w-4" />
         </button>
@@ -436,12 +437,12 @@ function NearbyList({
   return (
     // Padding leaves room for the floating title/chips and bottom switch.
     <div className="absolute inset-0 overflow-y-auto bg-mist px-3 pb-40 pt-[124px]">
-      <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-navy/65">
+      <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">
         {items.length} {severity ? severityShort(severity).toLowerCase() : ""}{" "}
         {items.length === 1 ? "report" : "reports"} within {RADIUS_M} m
       </h2>
       {items.length === 0 ? (
-        <p className="rounded-3xl bg-white p-6 text-center text-sm text-navy/70 shadow-sm">
+        <p className="rounded-3xl bg-surface p-6 text-center text-sm text-ink/70 shadow-sm">
           Walang reports dito ngayon. Try another filter.
         </p>
       ) : (
@@ -456,7 +457,7 @@ function NearbyList({
                 <button
                   type="button"
                   onClick={() => onOpen(report.id)}
-                  className="flex w-full items-center gap-3 rounded-2xl bg-white p-3 text-left shadow-sm active:bg-navy/5"
+                  className="flex w-full items-center gap-3 rounded-2xl bg-surface p-3 text-left shadow-sm active:bg-ink/5"
                 >
                   <span
                     className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
@@ -465,16 +466,16 @@ function NearbyList({
                     <Icon className="h-5 w-5" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-navy">
+                    <span className="block truncate text-sm font-semibold text-ink">
                       {report.headline ?? report.streetName}
                     </span>
-                    <span className="block truncate text-xs text-navy/70">
+                    <span className="block truncate text-xs text-ink/70">
                       {severityShort(report.severity)} ·{" "}
                       {waterLevelLabel(report.waterLevel)} ·{" "}
                       {formatDistance(distanceM)} · {relativeTime(report.timestamp)}
                     </span>
                   </span>
-                  <span aria-hidden="true" className="text-navy/45">
+                  <span aria-hidden="true" className="text-ink/45">
                     ›
                   </span>
                 </button>

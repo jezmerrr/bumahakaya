@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
 import { Avatar } from "./ui";
 import { ReportCard } from "./ReportCard";
+import { AppearancePicker } from "./ThemeControls";
 
 const AREAS = ["Taft Ave", "Vito Cruz", "Agno St", "Estrada St", "Leon Guinto"];
 const SAVED_KEY = "bk.savedAreas.v1";
@@ -54,7 +55,7 @@ export function ProfileSection({
     return (
       <Subpage title="My reports" onBack={() => setView("menu")}>
         {myReports.length === 0 ? (
-          <p className="text-sm text-navy/65">
+          <p className="text-sm text-ink/65">
             Wala ka pang na-report. Mag-tap sa + button para mag-report ng baha.
           </p>
         ) : (
@@ -71,7 +72,7 @@ export function ProfileSection({
   if (view === "areas") {
     return (
       <Subpage title="Saved areas" onBack={() => setView("menu")}>
-        <p className="mb-3 text-sm text-navy/65">
+        <p className="mb-3 text-sm text-ink/65">
           Save the streets you pass often para mabilis mo silang ma-check.
         </p>
 
@@ -82,9 +83,9 @@ export function ProfileSection({
             return (
               <div
                 key={area}
-                className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-sm"
+                className="flex items-center justify-between rounded-2xl bg-surface px-4 py-3 shadow-sm"
               >
-                <span className="text-sm font-semibold text-navy">
+                <span className="text-sm font-semibold text-ink">
                   {area}
                 </span>
 
@@ -95,7 +96,7 @@ export function ProfileSection({
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
                     isSaved
                       ? "bg-signal text-white"
-                      : "border border-navy/20 text-navy/70"
+                      : "border border-ink/20 text-ink/70"
                   }`}
                 >
                   {isSaved ? "Saved" : "Save"}
@@ -116,7 +117,7 @@ export function ProfileSection({
 
   return (
     <div className="px-4 pb-4 pt-4">
-      <h1 className="font-display text-2xl font-extrabold text-navy">
+      <h1 className="font-display text-2xl font-extrabold text-ink">
         Profile
       </h1>
 
@@ -126,45 +127,45 @@ export function ProfileSection({
           className="h-24 w-24 bg-signal text-2xl"
         />
 
-        <h2 className="mt-3 font-display text-xl font-extrabold text-navy">
+        <h2 className="mt-3 font-display text-xl font-extrabold text-ink">
           {CURRENT_USER.name}
         </h2>
 
-        <p className="text-sm text-navy/65">{CURRENT_USER.role}</p>
+        <p className="text-sm text-ink/65">{CURRENT_USER.role}</p>
       </div>
 
-      <div className="mt-5 flex rounded-3xl bg-white p-4 shadow-sm">
+      <div className="mt-5 flex rounded-3xl bg-surface p-4 shadow-sm">
         {stats.map((s) => (
           <div key={s.label} className="flex-1 text-center">
-            <p className="font-display text-xl font-extrabold text-navy">
+            <p className="font-display text-xl font-extrabold text-ink">
               {s.value}
             </p>
-            <p className="text-xs text-navy/65">{s.label}</p>
+            <p className="text-xs text-ink/65">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Profile Menu */}
-      <div className="mt-4 overflow-hidden rounded-3xl bg-white shadow-sm">
+      <div className="mt-4 overflow-hidden rounded-3xl bg-surface shadow-sm">
         <button
           type="button"
           onClick={() => setView("reports")}
-          className="flex w-full items-center justify-between px-4 py-4 text-left text-sm font-semibold text-navy"
+          className="flex w-full items-center justify-between px-4 py-4 text-left text-sm font-semibold text-ink"
         >
-          My reports <span className="text-navy/45">›</span>
+          My reports <span className="text-ink/45">›</span>
         </button>
 
-        <div className="mx-4 border-t border-navy/10" />
+        <div className="mx-4 border-t border-ink/10" />
 
         <button
           type="button"
           onClick={() => setView("areas")}
-          className="flex w-full items-center justify-between px-4 py-4 text-left text-sm font-semibold text-navy"
+          className="flex w-full items-center justify-between px-4 py-4 text-left text-sm font-semibold text-ink"
         >
-          Saved areas <span className="text-navy/45">›</span>
+          Saved areas <span className="text-ink/45">›</span>
         </button>
 
-        <div className="mx-4 border-t border-navy/10" />
+        <div className="mx-4 border-t border-ink/10" />
 
         <button
           type="button"
@@ -175,14 +176,27 @@ export function ProfileSection({
         </button>
       </div>
 
+      {/* Appearance */}
+      <div className="mt-4 rounded-3xl bg-surface p-4 shadow-sm">
+        <h3 className="font-display text-sm font-extrabold text-ink">
+          Appearance
+        </h3>
+        <p className="mt-0.5 text-xs text-ink/65">
+          Light, dark, or follow your phone&apos;s setting.
+        </p>
+        <div className="mt-3">
+          <AppearancePicker />
+        </div>
+      </div>
+
       {/* Business Tools */}
-      <div className="mt-4 rounded-3xl bg-white p-4 shadow-sm">
+      <div className="mt-4 rounded-3xl bg-surface p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-display text-sm font-extrabold text-navy">
+          <h3 className="font-display text-sm font-extrabold text-ink">
             Business Tools
           </h3>
 
-          <span className="rounded-full bg-[#E8F3EF] px-2.5 py-1 text-[10px] font-bold text-[#247A60]">
+          <span className="rounded-full bg-pass/15 px-2.5 py-1 text-[10px] font-bold text-[color:var(--sev-ink-pass)]">
             Business
           </span>
         </div>
@@ -192,7 +206,7 @@ export function ProfileSection({
           onClick={() => onBusinessDashboard?.()}
           className="flex w-full items-center gap-3 text-left"
         >
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#E8F3EF] text-[#247A60]">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-pass/15 text-[color:var(--sev-ink-pass)]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="21"
@@ -215,20 +229,20 @@ export function ProfileSection({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-navy">
+            <p className="text-sm font-bold text-ink">
               Business Dashboard
             </p>
 
-            <p className="mt-0.5 text-xs text-navy/65">
+            <p className="mt-0.5 text-xs text-ink/65">
               Monitor flood risks and business insights.
             </p>
           </div>
 
-          <span className="text-lg text-navy/45">›</span>
+          <span className="text-lg text-ink/45">›</span>
         </button>
       </div>
 
-      <p className="mt-4 text-center text-[11px] text-navy/60">
+      <p className="mt-4 text-center text-[11px] text-ink/60">
         Demo profile. Accounts are not part of this MVP.
       </p>
     </div>
@@ -251,12 +265,12 @@ function Subpage({
           type="button"
           onClick={onBack}
           aria-label="Back"
-          className="rounded-full border border-navy/15 px-3 py-1 text-sm font-semibold text-navy/70"
+          className="rounded-full border border-ink/15 px-3 py-1 text-sm font-semibold text-ink/70"
         >
           ‹ Back
         </button>
 
-        <h1 className="font-display text-xl font-extrabold text-navy">
+        <h1 className="font-display text-xl font-extrabold text-ink">
           {title}
         </h1>
       </div>

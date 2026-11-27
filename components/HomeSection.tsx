@@ -10,7 +10,7 @@ import {
   newestTimestamp,
   summarize,
 } from "@/lib/mapSummary";
-import { severityColor, severityInk, severityShort } from "@/lib/severity";
+import { severityColor, severityFill, severityShort } from "@/lib/severity";
 import type { Severity } from "@/lib/types";
 import { HomeHero } from "./HomeHero";
 import { SearchIcon, SlidersIcon, XIcon } from "./icons";
@@ -103,10 +103,10 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
       </div>
 
       {/* Search + Filters stay at the top while scrolling */}
-      <div className="sticky top-0 z-20 border-b border-navy/5 bg-mist/85 px-4 pb-2 pt-3 backdrop-blur-xl">
+      <div className="sticky top-0 z-20 border-b border-ink/5 bg-mist/85 px-4 pb-2 pt-3 backdrop-blur-xl">
         <div className="flex gap-2">
           <div role="search" className="relative min-w-0 flex-1">
-            <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-navy/60" />
+            <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/60" />
             <input
               type="search"
               value={query}
@@ -119,14 +119,14 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
               enterKeyHint="search"
               autoComplete="off"
               // 16px text stops iOS Safari from zooming in on focus.
-              className="w-full rounded-full border border-navy/10 bg-white py-2.5 pl-10 pr-10 text-base text-navy shadow-sm placeholder:text-navy/50 [&::-webkit-search-cancel-button]:appearance-none"
+              className="w-full rounded-full border border-ink/10 bg-surface py-2.5 pl-10 pr-10 text-base text-ink shadow-sm placeholder:text-ink/50 [&::-webkit-search-cancel-button]:appearance-none"
             />
             {query ? (
               <button
                 type="button"
                 aria-label="Clear search"
                 onClick={() => setQuery("")}
-                className="absolute right-1.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-navy/65 hover:bg-navy/5"
+                className="absolute right-1.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-ink/65 hover:bg-ink/5"
               >
                 <XIcon className="h-4 w-4" />
               </button>
@@ -141,8 +141,8 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
             }
             className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full border shadow-sm ${
               activeFilters
-                ? "border-navy bg-navy text-white"
-                : "border-navy/10 bg-white text-navy/70"
+                ? "border-ink bg-ink text-surface"
+                : "border-ink/10 bg-surface text-ink/70"
             }`}
           >
             <SlidersIcon className="h-5 w-5" />
@@ -175,7 +175,7 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
 
         {filtering ? (
           <div className="mt-2 flex items-center justify-between text-xs">
-            <p role="status" className="text-navy/70">
+            <p role="status" className="text-ink/70">
               {total} {total === 1 ? "result" : "results"}
               {severity !== null && source === "All"
                 ? " · community reports only"
@@ -197,10 +197,10 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
       <div className="space-y-2.5 px-4 pb-4 pt-3">
         {!filtering ? (
           <div className="flex items-baseline justify-between px-1">
-            <h2 className="font-display text-base font-extrabold text-navy">
+            <h2 className="font-display text-base font-extrabold text-ink">
               Latest updates
             </h2>
-            <span className="text-xs text-navy/65">
+            <span className="text-xs text-ink/65">
               {total} {total === 1 ? "post" : "posts"}
             </span>
           </div>
@@ -218,11 +218,11 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
         ))}
 
         {total === 0 ? (
-          <div className="rounded-3xl bg-white p-6 text-center shadow-sm">
-            <p className="font-display text-base font-extrabold text-navy">
+          <div className="rounded-3xl bg-surface p-6 text-center shadow-sm">
+            <p className="font-display text-base font-extrabold text-ink">
               {filtering ? "Walang tugma" : "Wala pang posts dito"}
             </p>
-            <p className="mt-1 text-sm text-navy/70">
+            <p className="mt-1 text-sm text-ink/70">
               {filtering
                 ? query.trim()
                   ? `Nothing matches “${query.trim()}”. Try another street name or clear the filters.`
@@ -244,13 +244,13 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
 
       {filtersOpen ? (
         <BottomSheet title="Filters" onClose={() => setFiltersOpen(false)}>
-          <p className="text-xs font-semibold uppercase tracking-wide text-navy/65">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink/65">
             Show
           </p>
           <div
             role="group"
             aria-label="Filter by source"
-            className="mt-2 grid grid-cols-3 gap-1 rounded-full bg-navy/5 p-1"
+            className="mt-2 grid grid-cols-3 gap-1 rounded-full bg-ink/5 p-1"
           >
             {SOURCES.map((s) => {
               const active = s === source;
@@ -261,7 +261,7 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
                   onClick={() => chooseSource(s)}
                   aria-pressed={active}
                   className={`rounded-full py-2 text-sm font-semibold ${
-                    active ? "bg-white text-navy shadow-sm" : "text-navy/70"
+                    active ? "bg-surface text-ink shadow-sm" : "text-ink/70"
                   }`}
                 >
                   {s}
@@ -272,7 +272,7 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
 
           {source !== "Social" ? (
             <>
-              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-navy/65">
+              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-ink/65">
                 Road condition
               </p>
               <div
@@ -283,7 +283,7 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
                 {CONDITIONS.map((s) => {
                   const active = s === severity;
                   const color = severityColor(s);
-                  const ink = severityInk(s);
+                  const fill = severityFill(s);
                   return (
                     <button
                       key={s}
@@ -292,13 +292,13 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
                       aria-pressed={active}
                       style={
                         active
-                          ? { backgroundColor: ink, borderColor: ink }
+                          ? { backgroundColor: fill, borderColor: fill }
                           : undefined
                       }
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold ${
                         active
                           ? "text-white"
-                          : "border-navy/15 bg-white text-navy/70"
+                          : "border-ink/15 bg-surface text-ink/70"
                       }`}
                     >
                       <span
@@ -321,7 +321,7 @@ export function HomeSection({ onOpenMap }: { onOpenMap?: () => void }) {
                 setSeverity(null);
                 setSource("All");
               }}
-              className="px-2 py-3 text-sm font-semibold text-navy/70"
+              className="px-2 py-3 text-sm font-semibold text-ink/70"
             >
               Reset
             </button>
@@ -353,7 +353,7 @@ function ActiveChip({
       type="button"
       onClick={onRemove}
       aria-label={`Remove filter: ${label}`}
-      className="inline-flex items-center gap-1.5 rounded-full border border-navy/10 bg-white py-1 pl-2.5 pr-1.5 text-xs font-semibold text-navy/80 shadow-sm"
+      className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-surface py-1 pl-2.5 pr-1.5 text-xs font-semibold text-ink/80 shadow-sm"
     >
       {color ? (
         <span
@@ -363,7 +363,7 @@ function ActiveChip({
         />
       ) : null}
       {label}
-      <XIcon className="h-3.5 w-3.5 text-navy/60" />
+      <XIcon className="h-3.5 w-3.5 text-ink/60" />
     </button>
   );
 }

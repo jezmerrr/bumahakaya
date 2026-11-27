@@ -2,7 +2,12 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useId, useState, type FormEvent, type ReactNode } from "react";
-import { severityColor, severityInk, waterLevelLabel } from "@/lib/severity";
+import {
+  severityColor,
+  severityFill,
+  severityInk,
+  waterLevelLabel,
+} from "@/lib/severity";
 import type { Severity, WaterLevel } from "@/lib/types";
 
 export interface ReportFormValues {
@@ -49,7 +54,7 @@ export function headlineFor(location: string): string {
 }
 
 const labelText =
-  "block text-xs font-semibold uppercase tracking-wide text-navy/65";
+  "block text-xs font-semibold uppercase tracking-wide text-ink/65";
 const sectionLabel = `mt-5 ${labelText}`;
 
 // The flood report form, used both to post a new report (Report tab) and to
@@ -113,7 +118,7 @@ export function ReportForm({
         onChange={(e) => setLocation(e.target.value)}
         placeholder="e.g. Taft Ave cor. Estrada"
         required
-        className="mt-2 w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm"
+        className="mt-2 w-full rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-sm"
       />
 
       {/* Water level */}
@@ -133,8 +138,8 @@ export function ReportForm({
               aria-pressed={active}
               className={`rounded-2xl border py-3 text-sm font-semibold ${
                 active
-                  ? "border-navy bg-navy text-white"
-                  : "border-navy/15 bg-white text-navy"
+                  ? "border-ink bg-ink text-surface"
+                  : "border-ink/15 bg-surface text-ink"
               }`}
             >
               {waterLevelLabel(level)}
@@ -159,10 +164,10 @@ export function ReportForm({
               aria-pressed={active}
               style={
                 active
-                  ? { backgroundColor: ink, color: "#fff" }
+                  ? { backgroundColor: severityFill(option.severity), color: "#fff" }
                   : {
-                      // Tint over white, so the text stays readable on any page color
-                      backgroundColor: "#fff",
+                      // Tint over the card color, so the text stays readable on any page color
+                      backgroundColor: "var(--color-surface)",
                       backgroundImage: `linear-gradient(${color}1f, ${color}1f)`,
                       color: ink,
                     }
@@ -179,7 +184,7 @@ export function ReportForm({
       <p className={sectionLabel}>Photo</p>
       <label
         htmlFor={`${id}-photo`}
-        className="mt-2 flex min-h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-navy/20 bg-white/50 text-sm text-navy/65"
+        className="mt-2 flex min-h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-ink/20 bg-surface/50 text-sm text-ink/65"
       >
         {photoUrl ? (
           <img
@@ -200,7 +205,7 @@ export function ReportForm({
       </label>
       {photoUrl ? (
         <div className="mt-1.5 flex justify-between text-xs">
-          <span className="text-navy/60">Tap the photo to change it</span>
+          <span className="text-ink/60">Tap the photo to change it</span>
           <button
             type="button"
             onClick={() => setPhotoUrl(undefined)}
@@ -221,7 +226,7 @@ export function ReportForm({
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Describe the flooding or share other important details..."
         rows={4}
-        className="mt-2 w-full resize-none rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm"
+        className="mt-2 w-full resize-none rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-sm"
       />
 
       {/* Submit */}
@@ -235,7 +240,7 @@ export function ReportForm({
         <button
           type="button"
           onClick={onCancel}
-          className="mt-2 w-full rounded-2xl py-3 text-sm font-semibold text-navy/70"
+          className="mt-2 w-full rounded-2xl py-3 text-sm font-semibold text-ink/70"
         >
           Cancel
         </button>

@@ -186,13 +186,13 @@ export function FloodScene({
       data-level={level}
       data-severity={severity}
       data-person={look.person}
-      className="overflow-hidden rounded-3xl bg-white shadow-sm"
+      className="overflow-hidden rounded-3xl bg-surface shadow-sm"
     >
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label={label}
-        className="block h-auto w-full"
+        className="flood-scene-art block h-auto w-full"
       >
         <defs>
           <linearGradient id={`${uid}-sky`} x1="0" y1="0" x2="0" y2="1">
@@ -267,13 +267,13 @@ export function FloodScene({
           style={{ backgroundColor: severityColor(severity) }}
         />
         <div>
-          <p className="font-display text-sm font-extrabold text-navy">
+          <p className="font-display text-sm font-extrabold text-ink">
             {scene.title} · {depth}{" "}
-            <span className="font-sans font-semibold text-navy/70">
+            <span className="font-sans font-semibold text-ink/70">
               ({look.depthNote})
             </span>
           </p>
-          <p className="text-sm text-navy/70">{scene.advice}</p>
+          <p className="text-sm text-ink/70">{scene.advice}</p>
         </div>
       </figcaption>
     </figure>

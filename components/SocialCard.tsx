@@ -4,7 +4,7 @@ import { DemoDataBadge } from "./DemoDataBadge";
 
 const PLATFORM: Record<Platform, { label: string; className: string }> = {
   facebook: { label: "Facebook", className: "bg-[#1877F2] text-white" },
-  x: { label: "X", className: "bg-navy text-white" },
+  x: { label: "X", className: "bg-ink text-surface" },
   reddit: { label: "Reddit", className: "bg-[#FF4500] text-white" },
 };
 
@@ -13,7 +13,7 @@ export function SocialCard({ post }: { post: SocialPost }) {
   return (
     <article
       data-testid="social-card"
-      className="rounded-3xl bg-white p-4 shadow-sm"
+      className="rounded-3xl bg-surface p-4 shadow-sm"
     >
       <div className="flex flex-wrap items-center gap-1.5">
         <span
@@ -21,10 +21,10 @@ export function SocialCard({ post }: { post: SocialPost }) {
         >
           {p.label}
         </span>
-        <span className="text-xs font-semibold text-navy">{post.author}</span>
+        <span className="text-xs font-semibold text-ink">{post.author}</span>
         <DemoDataBadge />
       </div>
-      <p className="mt-2 text-sm text-navy/70">{post.text}</p>
+      <p className="mt-2 text-sm text-ink/70">{post.text}</p>
       <div className="mt-2 flex items-center justify-between">
         <a
           href={post.link}
@@ -34,7 +34,7 @@ export function SocialCard({ post }: { post: SocialPost }) {
         >
           View post
         </a>
-        <span className="text-[11px] text-navy/65">
+        <span className="text-[11px] text-ink/65">
           {relativeTime(post.timestamp)}
         </span>
       </div>

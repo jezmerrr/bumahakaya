@@ -25,7 +25,7 @@ export function CommentThread({ reportId }: { reportId: string }) {
   return (
     <div>
       {thread.length === 0 ? (
-        <p className="text-xs text-navy/60">
+        <p className="text-xs text-ink/60">
           Wala pang comments. Ikaw ang mauna.
         </p>
       ) : (
@@ -35,13 +35,13 @@ export function CommentThread({ reportId }: { reportId: string }) {
               <Avatar name={c.author} className="h-7 w-7 text-[10px]" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs">
-                  <span className="font-semibold text-navy">{c.author}</span>
-                  <span className="text-navy/60">
+                  <span className="font-semibold text-ink">{c.author}</span>
+                  <span className="text-ink/60">
                     {" "}
                     · {relativeTime(c.timestamp)}
                   </span>
                 </p>
-                <p className="text-sm text-navy/70">{c.text}</p>
+                <p className="text-sm text-ink/70">{c.text}</p>
               </div>
               {c.author === CURRENT_USER.handle ? (
                 <button
@@ -49,7 +49,7 @@ export function CommentThread({ reportId }: { reportId: string }) {
                   aria-label="Delete comment"
                   title="Delete comment"
                   onClick={() => setPendingDelete(c.id)}
-                  className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-full text-navy/60 hover:bg-impass/10 hover:text-impass"
+                  className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-full text-ink/60 hover:bg-impass/10 hover:text-impass"
                 >
                   <TrashIcon className="h-3.5 w-3.5" />
                 </button>
@@ -65,7 +65,7 @@ export function CommentThread({ reportId }: { reportId: string }) {
           onChange={(e) => setDraft(e.target.value)}
           aria-label="Add a comment"
           placeholder="Add a comment…"
-          className="min-w-0 flex-1 rounded-full border border-navy/15 bg-white px-3 py-2 text-sm"
+          className="min-w-0 flex-1 rounded-full border border-ink/15 bg-surface px-3 py-2 text-sm"
         />
         <button
           type="submit"
