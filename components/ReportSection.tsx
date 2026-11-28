@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { CURRENT_USER } from "@/lib/user";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
+import { usePhotoCandidates } from "./SmartCheck";
 
 export function ReportSection({ onPosted }: { onPosted?: () => void }) {
   const { addReport } = useStore();
+  const photoCandidates = usePhotoCandidates();
   // Bumped after each post so the form remounts empty.
   const [formKey, setFormKey] = useState(0);
 
@@ -36,6 +38,7 @@ export function ReportSection({ onPosted }: { onPosted?: () => void }) {
       key={formKey}
       submitLabel="Post report"
       onSubmit={post}
+      photoCandidates={photoCandidates}
       className="px-4 pb-4 pt-4"
     >
       <h1 className="font-display text-2xl font-extrabold text-ink">
