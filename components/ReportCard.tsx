@@ -19,6 +19,7 @@ import {
 } from "./icons";
 import { EditReportSheet, ReportDetail } from "./ReportDetail";
 import { ConfirmDeleteDialog } from "./Sheet";
+import { SmartCheckChip } from "./SmartCheck";
 import { OwnerActions, SensorBar } from "./ui";
 
 export function ReportCard({
@@ -169,6 +170,7 @@ export function ReportCard({
         >
           <CommentIcon className="h-4 w-4" /> {commentCount}
         </button>
+        <SmartCheckChip report={report} />
         <span className="ml-auto truncate pl-2 text-xs text-ink/60">
           {report.author ? `@${report.author}` : "Anonymous"}
         </span>

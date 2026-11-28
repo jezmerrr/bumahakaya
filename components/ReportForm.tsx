@@ -10,9 +10,11 @@ import {
 } from "@/lib/severity";
 import type { LatLng } from "@/lib/geo";
 import { compressPhoto } from "@/lib/photo";
+import type { PhotoCandidate } from "@/lib/photoCheck";
 import type { Severity, WaterLevel } from "@/lib/types";
 import { MapIcon, MapPinIcon } from "./icons";
 import { describePin, LocationPickerSheet } from "./LocationPicker";
+import { PhotoCheckNote } from "./SmartCheck";
 
 export interface ReportFormValues {
   location: string;
@@ -73,6 +75,7 @@ export function ReportForm({
   onSubmit,
   onCancel,
   className,
+  photoCandidates,
   children,
 }: {
   initial?: ReportFormValues;
@@ -80,6 +83,9 @@ export function ReportForm({
   onSubmit: (values: ReportFormValues) => void;
   onCancel?: () => void;
   className?: string;
+  // Other posts' photos. When given, a newly picked photo is checked against
+  // them (Smart check) and a note says if it was already posted.
+  photoCandidates?: PhotoCandidate[];
   // Optional heading rendered above the fields.
   children?: ReactNode;
 }) {
@@ -307,6 +313,9 @@ export function ReportForm({
             Remove photo
           </button>
         </div>
+      ) : null}
+      {photoUrl && photoCandidates && photoUrl !== initial.photoUrl ? (
+        <PhotoCheckNote photoUrl={photoUrl} candidates={photoCandidates} />
       ) : null}
 
       {/* Description */}

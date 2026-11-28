@@ -41,8 +41,10 @@ export const seedReports: Report[] = [
     severity: "Caution",
     waterLevel: "Knee",
     passable: true,
-    sensorCm: 28,
-    trend: "steady",
+    // The Agno sensor right next to it now reads waist-deep, so Smart check
+    // flags this post: the water rose after it was posted.
+    sensorCm: 71,
+    trend: "rising",
     confirms: 23,
     comments: 6,
     photoUrl: "/demo/flood-taft-pedicabs.jpg",

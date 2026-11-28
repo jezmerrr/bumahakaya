@@ -14,6 +14,7 @@ import { DisputedNotice, FlagSheet } from "./FlagReport";
 import { FlagIcon, MapPinIcon, ThumbsUpIcon } from "./icons";
 import { headlineFor, ReportForm, type ReportFormValues } from "./ReportForm";
 import { ConfirmDeleteDialog, Sheet } from "./Sheet";
+import { SmartCheckPanel, usePhotoCandidates } from "./SmartCheck";
 import {
   Avatar,
   formatDistance,
@@ -160,6 +161,8 @@ export function ReportDetail({
           ) : null}
         </section>
 
+        <SmartCheckPanel report={report} />
+
         <button
           type="button"
           onClick={() => toggleConfirm(report.id)}
@@ -270,6 +273,7 @@ export function EditReportSheet({
   onClose: () => void;
 }) {
   const { updateReport } = useStore();
+  const photoCandidates = usePhotoCandidates(report.id);
 
   const initial: ReportFormValues = {
     location: report.streetName,
@@ -302,6 +306,7 @@ export function EditReportSheet({
         initial={initial}
         submitLabel="Save changes"
         onSubmit={save}
+        photoCandidates={photoCandidates}
         onCancel={onClose}
       />
     </Sheet>
